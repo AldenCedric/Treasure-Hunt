@@ -1,0 +1,105 @@
+.bg-dot {
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 9999px;
+  background-color: #81d4fa; /* bg-cyan-300 equivalent */
+  will-change: transform;
+  transform: translate3d(0,0,0);
+}
+
+@keyframes bob0 {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+@keyframes bob1 {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+@keyframes bob2 {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
+
+.bob0 { animation-name: bob0; animation-timing-function: ease-in-out; animation-iteration-count: infinite; animation-duration: 2s; }
+.bob1 { animation-name: bob1; animation-timing-function: ease-in-out; animation-iteration-count: infinite; animation-duration: 3s; }
+.bob2 { animation-name: bob2; animation-timing-function: ease-in-out; animation-iteration-count: infinite; animation-duration: 4s; }
+
+.delay0 { animation-delay: 0s; }
+.delay1 { animation-delay: 0.08s; }
+.delay2 { animation-delay: 0.16s; }
+.delay3 { animation-delay: 0.24s; }
+.delay4 { animation-delay: 0.32s; }
+.delay5 { animation-delay: 0.4s; }
+.delay6 { animation-delay: 0.48s; }
+.delay7 { animation-delay: 0.56s; }
+.delay8 { animation-delay: 0.64s; }
+.delay9 { animation-delay: 0.72s; }
+.delay10 { animation-delay: 0.8s; }
+.delay11 { animation-delay: 0.88s; }
+.delay12 { animation-delay: 0.96s; }
+.delay13 { animation-delay: 1.04s; }
+.delay14 { animation-delay: 1.12s; }
+.delay15 { animation-delay: 1.2s; }
+.delay16 { animation-delay: 1.28s; }
+.delay17 { animation-delay: 1.36s; }
+.delay18 { animation-delay: 1.44s; }
+.delay19 { animation-delay: 1.52s; }
+
+/* Low animation mode: pause or greatly reduce animations for performance */
+.lowAnimations .bg-dot,
+.lowAnimations .bob0,
+.lowAnimations .bob1,
+.lowAnimations .bob2 {
+  animation-play-state: paused !important;
+  opacity: 0.85;
+}
+.lowAnimations .fountain-bob {
+  animation-play-state: paused !important;
+  transform: scaleY(1) !important;
+}
+
+@keyframes fountain-bob {
+  0% { transform: scaleY(1); }
+  50% { transform: scaleY(1.04); }
+  100% { transform: scaleY(1); }
+}
+.fountain-bob { transform-origin: center; animation-name: fountain-bob; animation-duration: 3s; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
+
+/* Map frame and parchment look to mimic the provided treasure map artwork */
+.map-frame {
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 0 8px rgba(59,53,44,0.9);
+  background: linear-gradient(180deg, rgba(255,250,240,0.9), rgba(245,235,210,0.95));
+}
+
+.map-image {
+  image-rendering: -webkit-optimize-contrast; /* keep map crisp */
+  image-rendering: crisp-edges;
+  will-change: transform;
+}
+
+.map-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Question marker fade/pulse */
+@keyframes fadePulse {
+  0% { opacity: 0.75; }
+  50% { opacity: 1; }
+  100% { opacity: 0.75; }
+}
+.marker-pulse {
+  animation-name: fadePulse;
+  animation-duration: 3s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.lowAnimations .marker-pulse {
+  animation-play-state: paused !important;
+  opacity: 0.9 !important;
+}
