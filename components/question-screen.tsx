@@ -8,6 +8,7 @@ interface QuestionScreenProps {
   level: number
   onCorrectAnswer: () => void
   onBack: () => void
+  onWrong?: (level: number) => void
 }
 
 const questions = [
@@ -33,7 +34,7 @@ const questions = [
   { question: "How many wheels does a bicycle have?", answer: "2" },
 ]
 
-export default function QuestionScreen({ level, onCorrectAnswer, onBack }: QuestionScreenProps) {
+export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong }: QuestionScreenProps) {
   const [userAnswer, setUserAnswer] = useState("")
   const [showAnswer, setShowAnswer] = useState(false)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
@@ -52,6 +53,9 @@ export default function QuestionScreen({ level, onCorrectAnswer, onBack }: Quest
       setTimeout(() => {
         onCorrectAnswer()
       }, 1500)
+    } else {
+      // mark this level as wrong (user clicked check and was incorrect at least once)
+      if (typeof onWrong === "function") onWrong(level)
     }
   }
 

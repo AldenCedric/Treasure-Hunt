@@ -103,3 +103,32 @@
   animation-play-state: paused !important;
   opacity: 0.9 !important;
 }
+
+/* Responsive map container to better fit mobile screens */
+.map-container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Desktop/tablet: keep 4:3 aspect ratio for consistent framing */
+@media (min-width: 640px) {
+  .map-container {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* Mobile: use available viewport height so map fills the screen above controls */
+@media (max-width: 639px) {
+  .map-container {
+    height: calc(100vh - 220px); /* leave space for joystick / controls */
+    border-radius: 0.5rem;
+  }
+  /* ensure canvas scales to container on mobile */
+  .map-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+  }
+}

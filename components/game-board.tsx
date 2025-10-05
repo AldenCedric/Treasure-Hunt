@@ -26,8 +26,8 @@ export default function GameBoard(props: GameBoardProps) {
   const { completedLevels, onLevelClick } = props
   // Tunable gameplay constants
   const DEFAULT_SPEED = 3.2
-  const DEFAULT_CAMERA_CLAMP_X = { min: 0, max: 600 }
-  const DEFAULT_CAMERA_CLAMP_Y = { min: 0, max: 500 }
+  const DEFAULT_CAMERA_CLAMP_X = { min: 0, max: 490 }
+  const DEFAULT_CAMERA_CLAMP_Y = { min: 0, max: 375 }
 
   const SPEED_BASE_REF = useRef(DEFAULT_SPEED)
   const [lowAnimations, setLowAnimations] = useState(false)
@@ -70,6 +70,18 @@ export default function GameBoard(props: GameBoardProps) {
   // playerDirection removed (canvas rendering only)
   const animationFrameRef = useRef<number>()
   const lastUpdateRef = useRef<number>(Date.now())
+  // Ambient audio refs
+  const audioCtxRef = useRef<AudioContext | null>(null)
+  const ambientGainRef = useRef<GainNode | null>(null)
+  const ambientOscRefs = useRef<OscillatorNode[]>([])
+  const [ambientEnabled, setAmbientEnabled] = useState<boolean>(() => {
+    try {
+      const raw = localStorage.getItem("thq_ambient_enabled")
+      return raw == null ? true : JSON.parse(raw)
+    } catch {
+      return true
+    }
+  })
 
   // const tileSize = 32 // removed: tile grid replaced by single map image
   // We replaced the tile grid with a single pre-rendered map image for visual fidelity
@@ -199,6 +211,96 @@ export default function GameBoard(props: GameBoardProps) {
       // ignore
     }
   }, [questionMarkers])
+
+  // persist ambient preference
+  useEffect(() => {
+    try {
+      localStorage.setItem("thq_ambient_enabled", JSON.stringify(ambientEnabled))
+    } catch {
+      // ignore
+    }
+  }, [ambientEnabled])
+
+  // Ambient audio: create a gentle pad using OscillatorNodes when enabled
+  useEffect(() => {
+    if (!ambientEnabled) {
+      // ramp down and close audio context if present
+      const ctx = audioCtxRef.current
+      const gain = ambientGainRef.current
+      if (gain && ctx) {
+        try {
+          gain.gain.cancelScheduledValues(ctx.currentTime)
+          gain.gain.setTargetAtTime(0, ctx.currentTime, 0.5)
+        } catch {}
+        // close after fade
+        setTimeout(() => {
+          try {
+            ambientOscRefs.current.forEach((o) => { try { o.stop() } catch {} })
+            ctx.close().catch(() => {})
+          } catch {}
+          audioCtxRef.current = null
+          ambientGainRef.current = null
+          ambientOscRefs.current = []
+        }, 700)
+      }
+      return
+    }
+
+    // create audio context and nodes
+    if (!audioCtxRef.current && typeof window !== "undefined") {
+      const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext
+      if (!AudioCtx) return
+      const ctx: AudioContext = new AudioCtx()
+      audioCtxRef.current = ctx
+      const gain = ctx.createGain()
+      gain.gain.value = 0
+      gain.connect(ctx.destination)
+      ambientGainRef.current = gain
+
+      const filter = ctx.createBiquadFilter()
+      filter.type = "lowpass"
+      filter.frequency.value = 1000
+      filter.Q.value = 0.8
+
+      const osc1 = ctx.createOscillator()
+      osc1.type = "sine"
+      osc1.frequency.value = 110
+
+      const osc2 = ctx.createOscillator()
+      osc2.type = "sine"
+      osc2.frequency.value = 220
+      osc2.detune.value = 10
+
+      osc1.connect(filter)
+      osc2.connect(filter)
+      filter.connect(gain)
+
+      osc1.start()
+      osc2.start()
+
+      ambientOscRefs.current = [osc1, osc2]
+
+      // fade in
+      try {
+        gain.gain.setValueAtTime(0, ctx.currentTime)
+        gain.gain.linearRampToValueAtTime(0.035, ctx.currentTime + 1.8)
+      } catch {}
+    }
+
+    return () => {
+      // no-op: cleanup handled by ambientEnabled toggle or unmount
+    }
+  }, [ambientEnabled])
+
+  // close audio on unmount
+  useEffect(() => {
+    return () => {
+      try {
+        ambientOscRefs.current.forEach((o) => { try { o.stop() } catch {} })
+        if (audioCtxRef.current) audioCtxRef.current.close().catch(() => {})
+      } catch {}
+    }
+  }, [])
 
   // Canvas click to place selected marker (maps client coordinates to logical map coordinates)
   const handleCanvasClick = (e: React.MouseEvent) => {
@@ -476,7 +578,7 @@ export default function GameBoard(props: GameBoardProps) {
         {/* DebugPanel removed */}
 
         {/* Game Viewport */}
-        <div className={`relative w-full aspect-[4/3] border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]}`}>
+        <div className={`${styles["map-container"]} relative w-full border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]}`}>
           <div
             className="absolute inset-0 transition-transform duration-100"
             style={{
@@ -485,7 +587,7 @@ export default function GameBoard(props: GameBoardProps) {
           >
             {/* Canvas-based renderer (draws map, objects, markers, and player) */}
             <div className="absolute inset-0" onClick={handleCanvasClick}>
-              <canvas ref={canvasRef} className="block" />
+              <canvas ref={canvasRef} className="block w-full h-full" />
               {placementMode && (
                 <div className="absolute top-2 left-2 z-50 bg-black/70 text-white px-2 py-1 text-xs rounded">
                   Placement mode: selected {selectedMarkerIndex + 1} — click to move marker

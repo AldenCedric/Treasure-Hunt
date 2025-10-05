@@ -25,12 +25,12 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
           <div className="text-center">
             <h1 className="text-6xl md:text-8xl font-black tracking-tight">
               <span className="text-yellow-400 drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)] [text-shadow:_3px_3px_0_rgb(139_69_19)]">
-                Treasure
+                Organ
               </span>
             </h1>
             <h1 className="text-6xl md:text-8xl font-black tracking-tight -mt-4">
               <span className="text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)] [text-shadow:_3px_3px_0_rgb(139_69_19)]">
-                Hunt
+                Dash
               </span>
             </h1>
           </div>
