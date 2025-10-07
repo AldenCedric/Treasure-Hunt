@@ -310,7 +310,7 @@ export default function GameBoard(props: GameBoardProps) {
               // Draw question marker base (solid color)
               const baseColor = marker.color || pastelColor(marker.id)
               ctx.fillStyle = baseColor
-              ctx.globalAlpha = 0.3
+              ctx.globalAlpha = 0
               ctx.beginPath()
               ctx.arc(0, 0, radius, 0, Math.PI * 2)
               ctx.fill()
@@ -342,7 +342,7 @@ export default function GameBoard(props: GameBoardProps) {
               
               // Number text
               ctx.fillStyle = "#222"
-              ctx.globalAlpha = 0
+              ctx.globalAlpha = 1
               ctx.font = "bold 16px segoe ui"
               ctx.textAlign = "center"
               ctx.textBaseline = "middle"
