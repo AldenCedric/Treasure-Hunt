@@ -340,17 +340,18 @@ export default function GameBoard(props: GameBoardProps) {
               ctx.arc(0, 0, radius, 0, Math.PI * 2)
               ctx.fill()
               
-              // Number text
-              ctx.fillStyle = "#222"
-              ctx.globalAlpha = 1
+              // Number text 0 aplha visibilty for more challenge
+              ctx.fillStyle = "#white"
+              ctx.globalAlpha = 0
               ctx.font = "bold 16px segoe ui"
               ctx.textAlign = "center"
               ctx.textBaseline = "middle"
               ctx.fillText(String(marker.id), 0, 0)
 
               if (isNearby) {
-                ctx.fillStyle = "rgba(0,0,0,0.85)"
-                ctx.font = "bold 16px monospace"
+                ctx.fillStyle = "rgba(255,255,0,0.85)"
+                ctx.globalAlpha = 1
+                ctx.font = "bold 16px segoe ui"
                 ctx.fillText("Press [E]", 0, -36)
               }
               ctx.restore()
