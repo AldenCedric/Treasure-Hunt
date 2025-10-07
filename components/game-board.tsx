@@ -21,6 +21,9 @@ interface QuestionMarker {
   color: string
 }
 
+// Define player facing directions
+type PlayerDirection = 'north' | 'south' | 'east' | 'west';
+
 export default function GameBoard(props: GameBoardProps) {
   const { completedLevels, onLevelClick } = props
   const DEFAULT_SPEED = 3.2
@@ -34,6 +37,35 @@ export default function GameBoard(props: GameBoardProps) {
 
   const cameraClampXRef = useRef({ ...DEFAULT_CAMERA_CLAMP_X })
   const cameraClampYRef = useRef({ ...DEFAULT_CAMERA_CLAMP_Y })
+
+  // Player sprite state
+  const [playerDirection, setPlayerDirection] = useState<PlayerDirection>('south')
+  const [isMoving, setIsMoving] = useState(false)
+  const [animationFrame, setAnimationFrame] = useState(0)
+
+  // Sprite sheet paths for each direction
+  const spriteSheets = {
+    north: './player-north-sheet.png',
+    south: './player-south-sheet.png',
+    east: './player-east-sheet.png',
+    west: './player-west-sheet.png'
+  };
+
+  // Fallback single sprite paths
+  const singleSprites = {
+    north: './player-north.png',
+    south: './player-south.png',
+    east: './player-east.png',
+    west: './player-west.png'
+  };
+
+  // Sprite images ref
+  const spriteImagesRef = useRef<{ [key in PlayerDirection]: HTMLImageElement | null }>({
+    north: null,
+    south: null,
+    east: null,
+    west: null
+  });
 
   useEffect(() => {
     try {
@@ -126,6 +158,26 @@ export default function GameBoard(props: GameBoardProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const mapImageRef = useRef<HTMLImageElement | null>(null)
 
+  // Load sprite images
+  useEffect(() => {
+    const directions: PlayerDirection[] = ['north', 'south', 'east', 'west'];
+    directions.forEach(direction => {
+      const img = new Image();
+      img.src = spriteSheets[direction];
+      img.onload = () => {
+        spriteImagesRef.current[direction] = img;
+      };
+      img.onerror = () => {
+        // Fallback to single sprite if sheet fails to load
+        const fallbackImg = new Image();
+        fallbackImg.src = singleSprites[direction];
+        fallbackImg.onload = () => {
+          spriteImagesRef.current[direction] = fallbackImg;
+        };
+      };
+    });
+  }, []);
+
   useEffect(() => {
     const img = new Image()
     img.src = `/${MAP_IMAGE}`
@@ -137,6 +189,23 @@ export default function GameBoard(props: GameBoardProps) {
       mapImageRef.current = null
     }
   }, [])
+
+  // Animation loop for sprite frames
+  useEffect(() => {
+    let animationInterval: NodeJS.Timeout;
+
+    if (isMoving) {
+      animationInterval = setInterval(() => {
+        setAnimationFrame(prev => (prev + 1) % 4); // 4-frame animation cycle
+      }, 120);
+    } else {
+      setAnimationFrame(0);
+    }
+
+    return () => {
+      if (animationInterval) clearInterval(animationInterval);
+    };
+  }, [isMoving]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -150,6 +219,12 @@ export default function GameBoard(props: GameBoardProps) {
       if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "e"].includes(key)) {
         e.preventDefault()
         keysRef.current.add(key)
+
+        // Update player direction based on movement
+        if (key === "w" || key === "arrowup") setPlayerDirection('north')
+        if (key === "s" || key === "arrowdown") setPlayerDirection('south')
+        if (key === "a" || key === "arrowleft") setPlayerDirection('west')
+        if (key === "d" || key === "arrowright") setPlayerDirection('east')
 
         if (key === "e" && nearestQuestion !== null) {
           onLevelClick(nearestQuestion)
@@ -222,6 +297,54 @@ export default function GameBoard(props: GameBoardProps) {
     return false
   }
 
+  // Render player sprite on canvas
+  const renderPlayerSprite = (ctx: CanvasRenderingContext2D) => {
+    const spriteSize = 32;
+    const currentSprite = spriteImagesRef.current[playerDirection];
+
+    ctx.save();
+    ctx.translate(playerPosRef.current.x, playerPosRef.current.y);
+
+    if (currentSprite && currentSprite.complete) {
+      // Check if it's a sprite sheet (width > height indicates multiple frames)
+      const isSpriteSheet = currentSprite.width > currentSprite.height;
+      
+      if (isSpriteSheet && isMoving) {
+        // Animated sprite sheet version - only animate when moving
+        const frameWidth = currentSprite.width / 4; // Assuming 4 frames
+        ctx.drawImage(
+          currentSprite,
+          animationFrame * frameWidth, 0, // source x, y
+          frameWidth, spriteSize, // source width, height
+          -spriteSize/2, -spriteSize/2, // destination x, y
+          spriteSize, spriteSize // destination width, height
+        );
+      } else {
+        // Single sprite or first frame of sprite sheet when not moving
+        const sourceWidth = isSpriteSheet ? currentSprite.width / 4 : currentSprite.width;
+        ctx.drawImage(
+          currentSprite,
+          0, 0, // source x, y (always use first frame when not moving)
+          sourceWidth, spriteSize, // source width, height
+          -spriteSize/2, -spriteSize/2, // destination x, y
+          spriteSize, spriteSize // destination width, height
+        );
+      }
+    } else {
+      // Fallback: Simple colored rectangle (original behavior)
+      ctx.fillStyle = "#2196f3"
+      ctx.globalAlpha = 1.0
+      ctx.fillRect(-6, -8, 12, 16)
+      
+      ctx.fillStyle = "#ffcc80"
+      ctx.beginPath()
+      ctx.arc(0, -10, 5, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
+    ctx.restore();
+  }
+
   useEffect(() => {
     const gameLoop = () => {
       const now = Date.now()
@@ -232,17 +355,29 @@ export default function GameBoard(props: GameBoardProps) {
       let newY = playerPosRef.current.y
 
       const k = keysRef.current
+      const wasMoving = isMoving;
+      let nowMoving = false;
+
       if (k.has("w") || k.has("arrowup")) {
         newY -= speed
+        nowMoving = true;
       }
       if (k.has("s") || k.has("arrowdown")) {
         newY += speed
+        nowMoving = true;
       }
       if (k.has("a") || k.has("arrowleft")) {
         newX -= speed
+        nowMoving = true;
       }
       if (k.has("d") || k.has("arrowright")) {
         newX += speed
+        nowMoving = true;
+      }
+
+      // Update moving state
+      if (wasMoving !== nowMoving) {
+        setIsMoving(nowMoving);
       }
 
       newX = Math.max(150, Math.min(1400, newX))
@@ -357,21 +492,8 @@ export default function GameBoard(props: GameBoardProps) {
               ctx.restore()
             }
 
-            ctx.save()
-            ctx.translate(playerPosRef.current.x, playerPosRef.current.y)
-            
-            // Player body
-            ctx.fillStyle = "#2196f3"
-            ctx.globalAlpha = 1.0
-            ctx.fillRect(-6, -8, 12, 16)
-            
-            // Player head
-            ctx.fillStyle = "#ffcc80"
-            ctx.beginPath()
-            ctx.arc(0, -10, 5, 0, Math.PI * 2)
-            ctx.fill()
-            
-            ctx.restore()
+            // Render player sprite instead of simple rectangle
+            renderPlayerSprite(ctx);
           }
         }
       } catch {
@@ -387,17 +509,29 @@ export default function GameBoard(props: GameBoardProps) {
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [visibleMarkers, nearestQuestion])
+  }, [visibleMarkers, nearestQuestion, isMoving, animationFrame, playerDirection])
 
   const handleJoystickMove = useCallback((direction: { x: number; y: number }) => {
     if (Math.abs(direction.x) > 0.1 || Math.abs(direction.y) > 0.1) {
-      if (direction.y < -0.3) keysRef.current.add("w")
+      if (direction.y < -0.3) {
+        keysRef.current.add("w")
+        setPlayerDirection('north')
+      }
       else keysRef.current.delete("w")
-      if (direction.y > 0.3) keysRef.current.add("s")
+      if (direction.y > 0.3) {
+        keysRef.current.add("s")
+        setPlayerDirection('south')
+      }
       else keysRef.current.delete("s")
-      if (direction.x < -0.3) keysRef.current.add("a")
+      if (direction.x < -0.3) {
+        keysRef.current.add("a")
+        setPlayerDirection('west')
+      }
       else keysRef.current.delete("a")
-      if (direction.x > 0.3) keysRef.current.add("d")
+      if (direction.x > 0.3) {
+        keysRef.current.add("d")
+        setPlayerDirection('east')
+      }
       else keysRef.current.delete("d")
     } else {
       keysRef.current.clear()
@@ -579,6 +713,8 @@ export default function GameBoard(props: GameBoardProps) {
         <div className="absolute bottom-20 left-4 z-30 bg-gray-900/80 text-white px-4 py-2 rounded-lg border-2 border-gray-700 text-xs font-mono">
           <div>[WASD] - movement</div>
           <div>[E] - action</div>
+          <div>Facing: {playerDirection}</div>
+          <div>State: {isMoving ? 'Moving' : 'Idle'}</div>
         </div>
       </div>
     </div>
