@@ -1,12 +1,24 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { useEffect } from "react"
+import { playWelcome, pauseWelcome, resumeOnUserGesture } from "@/lib/audio"
 
 interface WelcomeScreenProps {
   onStart: () => void
 }
 
 export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
+  useEffect(() => {
+    playWelcome()
+    resumeOnUserGesture()
+    return () => { pauseWelcome() }
+  }, [])
+
+  const handleStart = () => {
+    pauseWelcome()
+    onStart()
+  }
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background island map */}
@@ -40,7 +52,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
 
         {/* Start Button */}
         <Button
-          onClick={onStart}
+          onClick={handleStart}
           size="lg"
           className="bg-gradient-to-b from-orange-500 to-orange-700 hover:from-orange-600 hover:to-orange-800 text-white font-black text-3xl md:text-4xl px-16 py-8 rounded-2xl shadow-2xl border-4 border-orange-900 transform hover:scale-105 transition-transform"
         >

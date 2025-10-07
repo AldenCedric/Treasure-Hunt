@@ -132,3 +132,42 @@
     display: block;
   }
 }
+
+/* Mobile landscape helper: rotate viewport if needed as a fallback when lock fails */
+.mobileLandscapeWrapper {
+  position: relative;
+  width: 100vh; /* swap dimensions */
+  height: 100vw;
+  transform: rotate(90deg);
+  transform-origin: left top;
+  overflow: hidden;
+}
+
+.mobileLandscapeInner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Overlay controls inside the game viewport */
+.controlsOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* allow canvas interactions except on buttons */
+}
+.controlsOverlayInner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 12px;
+}
+.controlsOverlay button {
+  pointer-events: auto; /* enable clicks */
+}

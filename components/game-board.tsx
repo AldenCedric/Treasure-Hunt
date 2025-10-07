@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback, useRef, useMemo } from "react"
 import styles from "./game-board.module.css"
 import MobileJoystick from "./mobile-joystick"
 import dotPositions from "./dot-positions.json"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { playGame, resumeOnUserGesture, getGameAudio } from "@/lib/audio"
 
 interface GameBoardProps {
   currentLevel: number
@@ -26,8 +28,8 @@ export default function GameBoard(props: GameBoardProps) {
   const { completedLevels, onLevelClick } = props
   // Tunable gameplay constants
   const DEFAULT_SPEED = 3.2
-  const DEFAULT_CAMERA_CLAMP_X = { min: 0, max: 490 }
-  const DEFAULT_CAMERA_CLAMP_Y = { min: 0, max: 375 }
+  const DEFAULT_CAMERA_CLAMP_X = { min: 0, max: 400 }
+  const DEFAULT_CAMERA_CLAMP_Y = { min: 0, max: 300 }
 
   const SPEED_BASE_REF = useRef(DEFAULT_SPEED)
   const [lowAnimations, setLowAnimations] = useState(false)
@@ -70,10 +72,7 @@ export default function GameBoard(props: GameBoardProps) {
   // playerDirection removed (canvas rendering only)
   const animationFrameRef = useRef<number>()
   const lastUpdateRef = useRef<number>(Date.now())
-  // Ambient audio refs
-  const audioCtxRef = useRef<AudioContext | null>(null)
-  const ambientGainRef = useRef<GainNode | null>(null)
-  const ambientOscRefs = useRef<OscillatorNode[]>([])
+  // Game soundtrack audio via shared singleton
   const [ambientEnabled, setAmbientEnabled] = useState<boolean>(() => {
     try {
       const raw = localStorage.getItem("thq_ambient_enabled")
@@ -84,41 +83,41 @@ export default function GameBoard(props: GameBoardProps) {
   })
 
   // const tileSize = 32 // removed: tile grid replaced by single map image
-  // We replaced the tile grid with a single pre-rendered map image for visual fidelity
+  //  replaced the tile grid with a single pre-rendered map image for visual fidelity
   // and far fewer DOM nodes (better performance). The image lives in /public and
   // is rendered at the same logical map size (MAP_WIDTH x MAP_HEIGHT).
   const MAP_IMAGE = "treasure-hunt-game-board-with-islands-and-paths.jpg"
 
   // Default question marker positions (can be edited in-place with placement mode)
   const DEFAULT_MARKERS: QuestionMarker[] = [
-    { id: 1, x: 350, y: 250, color: "bg-yellow-400" },
-    { id: 2, x: 500, y:200, color: "bg-orange-400" },
-    { id: 3, x: 650, y: 350, color: "bg-cyan-400" },
-    { id: 4, x: 850, y: 350, color: "bg-green-400" },
-    { id: 5, x: 950, y: 500, color: "bg-red-500" },
-    { id: 6, x: 750, y: 650, color: "bg-pink-400" },
-    { id: 7, x: 550, y: 700, color: "bg-lime-400" },
-    { id: 8, x: 350, y: 650, color: "bg-orange-500" },
-    { id: 9, x: 300, y: 450, color: "bg-blue-600" },
-    { id: 10, x: 450, y: 300, color: "bg-purple-500" },
-    { id: 11, x: 700, y: 250, color: "bg-teal-400" },
-    { id: 12, x: 950, y: 250, color: "bg-rose-400" },
-    { id: 13, x: 1050, y: 450, color: "bg-amber-400" },
-    { id: 14, x: 850, y: 750, color: "bg-emerald-500" },
-    { id: 15, x: 650, y: 850, color: "bg-indigo-500" },
-    { id: 16, x: 450, y: 800, color: "bg-fuchsia-400" },
-    { id: 17, x: 300, y: 750, color: "bg-sky-400" },
-    { id: 18, x: 350, y: 350, color: "bg-violet-500" },
-    { id: 19, x: 600, y: 500, color: "bg-red-400" },
-    { id: 20, x: 1100, y: 650, color: "bg-yellow-500" },
+    { id: 1, x: 717, y: 395, color: "hsl(138 60% 72%)" },
+    { id: 2, x: 552, y: 270, color: "hsl(275 60% 72%)" },
+    { id: 3, x: 758, y: 698, color: "hsl(53 60% 72%)" },
+    { id: 4, x: 708, y: 169, color: "hsl(190 60% 72%)" },
+    { id: 5, x: 880, y: 305, color: "hsl(328 60% 72%)" },
+    { id: 6, x: 848, y: 643, color: "hsl(105 60% 72%)" },
+    { id: 7, x: 1106, y: 328, color: "hsl(243 60% 72%)" },
+    { id: 8, x: 1241, y: 492, color: "hsl(20 60% 72%)" },
+    { id: 9, x: 1223, y: 577, color: "hsl(158 60% 72%)" },
+    { id: 10, x: 899, y: 734, color: "hsl(295 60% 72%)" },
+    { id: 11, x: 383, y: 577, color: "hsl(73 60% 72%)" },
+    { id: 12, x: 1091, y: 153, color: "hsl(210 60% 72%)" },
+    { id: 13, x: 1285, y: 237, color: "hsl(348 60% 72%)" },
+    { id: 14, x: 601, y: 764, color: "hsl(125 60% 72%)" },
+    { id: 15, x: 1120, y: 876, color: "hsl(263 60% 72%)" },
+    { id: 16, x: 857, y: 897, color: "hsl(40 60% 72%)" },
+    { id: 17, x: 488, y: 900, color: "hsl(178 60% 72%)" },
+    { id: 18, x: 444, y: 408, color: "hsl(315 60% 72%)" },
+    { id: 19, x: 420, y: 691, color: "hsl(93 60% 72%)" },
+    { id: 20, x: 257, y: 357, color: "hsl(230 60% 72%)" },
   ]
 
   // Simple pastel color generator: uses marker id to get a reproducible hue spread
   const pastelColor = (id: number) => {
     // golden angle spread
     const hue = (id * 137.508) % 360
-    const saturation = 60
-    const lightness = 72
+    const saturation = 10
+    const lightness = 10
     return `hsl(${Math.round(hue)} ${saturation}% ${lightness}%)`
   }
 
@@ -221,86 +220,22 @@ export default function GameBoard(props: GameBoardProps) {
     }
   }, [ambientEnabled])
 
-  // Ambient audio: create a gentle pad using OscillatorNodes when enabled
+  // Game soundtrack: loop via audio singleton, continue across screens
   useEffect(() => {
-    if (!ambientEnabled) {
-      // ramp down and close audio context if present
-      const ctx = audioCtxRef.current
-      const gain = ambientGainRef.current
-      if (gain && ctx) {
-        try {
-          gain.gain.cancelScheduledValues(ctx.currentTime)
-          gain.gain.setTargetAtTime(0, ctx.currentTime, 0.5)
-        } catch {}
-        // close after fade
-        setTimeout(() => {
-          try {
-            ambientOscRefs.current.forEach((o) => { try { o.stop() } catch {} })
-            ctx.close().catch(() => {})
-          } catch {}
-          audioCtxRef.current = null
-          ambientGainRef.current = null
-          ambientOscRefs.current = []
-        }, 700)
-      }
-      return
-    }
-
-    // create audio context and nodes
-    if (!audioCtxRef.current && typeof window !== "undefined") {
-      const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext
-      if (!AudioCtx) return
-      const ctx: AudioContext = new AudioCtx()
-      audioCtxRef.current = ctx
-      const gain = ctx.createGain()
-      gain.gain.value = 0
-      gain.connect(ctx.destination)
-      ambientGainRef.current = gain
-
-      const filter = ctx.createBiquadFilter()
-      filter.type = "lowpass"
-      filter.frequency.value = 1000
-      filter.Q.value = 0.8
-
-      const osc1 = ctx.createOscillator()
-      osc1.type = "sine"
-      osc1.frequency.value = 110
-
-      const osc2 = ctx.createOscillator()
-      osc2.type = "sine"
-      osc2.frequency.value = 220
-      osc2.detune.value = 10
-
-      osc1.connect(filter)
-      osc2.connect(filter)
-      filter.connect(gain)
-
-      osc1.start()
-      osc2.start()
-
-      ambientOscRefs.current = [osc1, osc2]
-
-      // fade in
+    if (typeof window === "undefined") return
+    // ensure any welcome music is paused when entering game
+    // pauseWelcome()
+    resumeOnUserGesture()
+    const audio = getGameAudio()
+    const run = async () => {
       try {
-        gain.gain.setValueAtTime(0, ctx.currentTime)
-        gain.gain.linearRampToValueAtTime(0.035, ctx.currentTime + 1.8)
+        if (ambientEnabled) await playGame()
+        else audio.pause()
       } catch {}
     }
-
-    return () => {
-      // no-op: cleanup handled by ambientEnabled toggle or unmount
-    }
+    run()
+    // do not pause on unmount; we want to continue when opening question screen
   }, [ambientEnabled])
-
-  // close audio on unmount
-  useEffect(() => {
-    return () => {
-      try {
-        ambientOscRefs.current.forEach((o) => { try { o.stop() } catch {} })
-        if (audioCtxRef.current) audioCtxRef.current.close().catch(() => {})
-      } catch {}
-    }
-  }, [])
 
   // Canvas click to place selected marker (maps client coordinates to logical map coordinates)
   const handleCanvasClick = (e: React.MouseEvent) => {
@@ -425,46 +360,75 @@ export default function GameBoard(props: GameBoardProps) {
 
             // environment objects removed — canvas draws only map, markers and player
 
-            // Question markers (with slow fade pulse)
+            // Question markers (circular, transparent with shiny effect)
             const nowMs = Date.now()
             for (const marker of questionMarkers) {
               ctx.save()
               ctx.translate(marker.x, marker.y)
-              // pulsing alpha
-              const phase = ((nowMs / 1000) + marker.id * 0.1) % 4
-              const alpha = 0.75 + 0.25 * Math.sin((phase / 4) * Math.PI * 2)
-              // marker background (unique pastel color or preserved color string)
+              
+              const isNearby = nearestQuestion === marker.id
+              const radius = 24
+              
+              // Shiny effect when nearby/interactable
+              if (isNearby && !completedLevels.includes(marker.id)) {
+                // Animated shine effect
+                const shinePhase = (nowMs / 800) % 1
+                const shineGradient = ctx.createRadialGradient(
+                  -radius * 0.3, -radius * 0.3, 0,
+                  0, 0, radius * 1.5
+                )
+                shineGradient.addColorStop(0, `rgba(255, 255, 255, ${0.8 * (1 - shinePhase)})`)
+                shineGradient.addColorStop(0.4, `rgba(255, 255, 255, ${0.3 * (1 - shinePhase)})`)
+                shineGradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+                
+                ctx.fillStyle = shineGradient
+                ctx.beginPath()
+                ctx.arc(0, 0, radius * 1.3, 0, Math.PI * 2)
+                ctx.fill()
+              }
+              
+              // Transparent circular marker with subtle glow
               const baseColor = marker.color || pastelColor(marker.id)
-              // draw with alpha applied
-              ctx.fillStyle = `rgba(0,0,0,0)`
-              // Use an offscreen canvas to compute an rgba from CSS color would be heavy; instead
-              // draw with globalAlpha and use the CSS color directly on fillStyle where supported.
+              const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, radius)
+              
+              // Parse color and create transparent version
               try {
                 ctx.save()
-                ctx.globalAlpha = alpha
+                ctx.globalAlpha = 0
                 ctx.fillStyle = baseColor
-                ctx.fillRect(-20, -20, 40, 40)
+                ctx.beginPath()
+                ctx.arc(0, 0, radius, 0, Math.PI * 2)
+                ctx.fill()
                 ctx.restore()
               } catch {
-                // fallback: yellowish
-                ctx.fillStyle = `rgba(255,213,79,${alpha})`
-                ctx.fillRect(-20, -20, 40, 40)
+                // fallback: semi-transparent yellow
+                ctx.fillStyle = `rgba(255, 213, 79, 0.6)`
+                ctx.beginPath()
+                ctx.arc(0, 0, radius, 0, Math.PI * 2)
+                ctx.fill()
               }
-              ctx.strokeStyle = "#424242"
-              ctx.lineWidth = 3
-              ctx.strokeRect(-20, -20, 40, 40)
-              // number
-              // choose number color for contrast
+              
+              // Inner glow for depth
+              const glowGradient = ctx.createRadialGradient(0, 0, radius * 0.5, 0, 0, radius)
+              glowGradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)')
+              glowGradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+              ctx.fillStyle = glowGradient
+              ctx.beginPath()
+              ctx.arc(0, 0, radius, 0, Math.PI * 2)
+              ctx.fill()
+              
+              // Number text
               ctx.fillStyle = "#222"
-              ctx.font = "bold 16px sans-serif"
+              ctx.font = "bold 18px sans-serif"
               ctx.textAlign = "center"
               ctx.textBaseline = "middle"
               ctx.fillText(completedLevels.includes(marker.id) ? "✓" : String(marker.id), 0, 0)
-              // proximity hint
-              if (nearestQuestion === marker.id && !completedLevels.includes(marker.id)) {
+              
+              // Proximity hint
+              if (isNearby && !completedLevels.includes(marker.id)) {
                 ctx.fillStyle = "rgba(0,0,0,0.85)"
                 ctx.font = "bold 12px monospace"
-                ctx.fillText("Press [E]", 0, -32)
+                ctx.fillText("Press [E]", 0, -36)
               }
               ctx.restore()
             }
@@ -517,6 +481,41 @@ export default function GameBoard(props: GameBoardProps) {
     }
   }, [])
 
+  // Mobile detection and orientation handling
+  const isMobile = useIsMobile()
+  const [isPortrait, setIsPortrait] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const updateOrientation = () => {
+      const portrait = window.matchMedia && window.matchMedia("(orientation: portrait)").matches
+      setIsPortrait(portrait)
+    }
+    updateOrientation()
+    const mql = window.matchMedia("(orientation: portrait)")
+    const onChange = () => updateOrientation()
+    try { mql.addEventListener("change", onChange) } catch { mql.addListener(onChange) }
+    return () => { try { mql.removeEventListener("change", onChange) } catch { mql.removeListener(onChange) } }
+  }, [])
+
+  useEffect(() => {
+    // Try to request landscape screen orientation on mobile
+    if (!isMobile) return
+    const orientation = (screen as any).orientation
+    if (orientation && orientation.lock) {
+      try { orientation.lock("landscape") } catch { /* ignore */ }
+    }
+  }, [isMobile])
+
+  const handleEPress = useCallback((pressed: boolean) => {
+    if (pressed) {
+      keysRef.current.add("e")
+      if (nearestQuestion !== null) onLevelClick(nearestQuestion)
+    } else {
+      keysRef.current.delete("e")
+    }
+  }, [nearestQuestion, onLevelClick])
+
   // terrain color helper removed; map uses a single pre-rendered image
 
   // environment render helpers removed
@@ -542,7 +541,7 @@ export default function GameBoard(props: GameBoardProps) {
       </div>
 
       {/* Game Container */}
-      <div className="relative w-full max-w-7xl">
+      <div className="relative w-full max-w-7xl" ref={containerRef}>
         {/* Top UI Bar */}
           <div className={`absolute top-0 left-0 right-0 z-20 flex justify-between items-start p-4 ${
             lowAnimations ? styles.lowAnimations : ""
@@ -556,6 +555,32 @@ export default function GameBoard(props: GameBoardProps) {
                 <span className="font-bold text-red-600">{completedLevels.length} / 20</span>
               </div>
             </div>
+          </div>
+
+          {/* Placement Mode Panel */}
+          <div className="bg-black/60 text-white rounded-lg p-3 border-2 border-white ml-auto flex flex-col gap-2">
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-bold">Placement</span>
+              <button
+                type="button"
+                className={`px-2 py-1 rounded text-xs font-bold border ${placementMode ? "bg-emerald-500 border-emerald-700" : "bg-gray-600 border-gray-800"}`}
+                onClick={() => setPlacementMode(v => !v)}
+              >
+                {placementMode ? "ON" : "OFF"}
+              </button>
+            </div>
+            <div className="flex items-center gap-2 text-xs">
+              <button type="button" className="px-2 py-1 bg-gray-700 rounded border border-gray-500"
+                onClick={() => setSelectedMarkerIndex(i => Math.max(0, i - 1))}>
+                ◀
+              </button>
+              <span>Marker {selectedMarkerIndex + 1} / {questionMarkers.length}</span>
+              <button type="button" className="px-2 py-1 bg-gray-700 rounded border border-gray-500"
+                onClick={() => setSelectedMarkerIndex(i => Math.min(questionMarkers.length - 1, i + 1))}>
+                ▶
+              </button>
+            </div>
+            <div className="text-[10px] opacity-80">P to toggle • [ / ] to change • Click map to move</div>
           </div>
 
           {/* Minimap */}
@@ -647,6 +672,27 @@ export default function GameBoard(props: GameBoardProps) {
               </div>
             )}
           </div>
+          {/* Mobile overlay controls (joystick + E) */}
+          {isMobile && (
+            <div className={`${styles.controlsOverlay}`}>
+              <div className={`${styles.controlsOverlayInner}`}>
+                <div>
+                  <MobileJoystick onMove={handleJoystickMove} />
+                </div>
+                <button
+                  type="button"
+                  aria-label="Action"
+                  onMouseDown={() => handleEPress(true)}
+                  onMouseUp={() => handleEPress(false)}
+                  onTouchStart={() => handleEPress(true)}
+                  onTouchEnd={() => handleEPress(false)}
+                  className="select-none rounded-full bg-orange-600 text-white font-black text-xl w-16 h-16 border-4 border-orange-900 shadow-xl active:scale-95"
+                >
+                  E
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Bottom UI Bar */}
@@ -673,7 +719,7 @@ export default function GameBoard(props: GameBoardProps) {
         </div>
       </div>
 
-      <MobileJoystick onMove={handleJoystickMove} />
+      {!isMobile && <MobileJoystick onMove={handleJoystickMove} />}
     </div>
   )
 }

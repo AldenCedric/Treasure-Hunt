@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { pauseWelcome } from "@/lib/audio"
 import { Button } from "./ui/button"
 
 interface LoginScreenProps {
@@ -11,6 +12,11 @@ interface LoginScreenProps {
 export default function LoginScreen({ onLogin, onBack }: LoginScreenProps) {
   const [username, setUsername] = useState("")
   const [avatar, setAvatar] = useState<string | undefined>(undefined)
+  // Ensure welcome soundtrack stops when entering login screen
+  useEffect(() => {
+    // stop welcome music on login screen
+    pauseWelcome()
+  }, [])
 
   const avatars = ["🏴‍☠️", "🦜", "⚓️", "🏝️", "🗺️"]
 
