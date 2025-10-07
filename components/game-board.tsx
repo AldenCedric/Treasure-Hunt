@@ -372,18 +372,22 @@ export default function GameBoard(props: GameBoardProps) {
         playerPosRef.current = { x: newX, y: newY }
         setPlayerPos({ x: newX, y: newY })
 
+        // FIXED CAMERA CENTERING LOGIC
         const rect = containerRef.current?.getBoundingClientRect()
         const viewportWidth = rect?.width ?? 1000
         const viewportHeight = rect?.height ?? (viewportWidth * 3) / 4
-
+        
+        // Calculate camera position to center player
         const targetCameraX = newX - viewportWidth / 2
         const targetCameraY = newY - viewportHeight / 2
-
+        
+        // Calculate camera bounds based on map size
         const cameraMinX = 0
         const cameraMaxX = MAP_WIDTH - viewportWidth
         const cameraMinY = 0
         const cameraMaxY = MAP_HEIGHT - viewportHeight
-
+        
+        // Clamp camera to map boundaries
         const clampedCameraX = Math.max(cameraMinX, Math.min(cameraMaxX, targetCameraX))
         const clampedCameraY = Math.max(cameraMinY, Math.min(cameraMaxY, targetCameraY))
         
@@ -543,7 +547,8 @@ export default function GameBoard(props: GameBoardProps) {
 
   return (
     <div className={`min-h-screen w-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center p-4 relative overflow-hidden ${
-      lowAnimations ? styles.lowAnimations : ""}`}>
+      lowAnimations ? styles.lowAnimations : ""
+    }`}>
       <div className="absolute inset-0 opacity-20 pointer-events-none">
         {useMemo(() => {
           type DotPos = { left: number; top: number; bob: 0 | 1 | 2; delay: number }
@@ -552,48 +557,32 @@ export default function GameBoard(props: GameBoardProps) {
             <div
               key={i}
               className={`absolute ${styles["bg-dot"]} ${styles[`bob${dot.bob}`]} ${styles[`delay${dot.delay}`]}`}
-              style={{ left: `${dot.left}%`, top: `${dot.top}%` }}/>))}, [])}
+              style={{ left: `${dot.left}%`, top: `${dot.top}%` }}
+            />
+          ))
+        }, [])}
       </div>
 
       <div className="relative w-full max-w-7xl" ref={containerRef}>
 
         <div className={`absolute top-4 left-1/2 transform -translate-x-1/2 z-30 flex justify-center items-start gap-8 w-full max-w-4xl px-4 ${
-          lowAnimations ? styles.lowAnimations : ""}`}>
-          <div className="bg-gray-800 border-4 border-gray-600 rounded-lg p-4 shadow-xl pixel-corners max-w-xs">
-            <h3 className="font-black text-white text-lg mb-2 text-center">Gather Questions</h3>
-            <div className="space-y-1 text-sm text-center">
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 bg-yellow-400 border-2 border-gray-800 rounded-sm" />
-                <span className="font-bold text-yellow-400 text-lg">{completedLevels.length} / 20</span>
-              </div>
-            </div>
-          </div>
+          lowAnimations ? styles.lowAnimations : ""
+        }`}>
 
-          <div className="bg-gray-800 border-4 border-gray-600 rounded-full p-2 shadow-xl w-20 h-20 relative overflow-hidden">
-            <div className="absolute inset-1 bg-teal-600 rounded-full">
-              <div className="absolute inset-2 bg-green-600 rounded-full" />
-              <div
-                className="absolute w-2 h-2 bg-red-500 rounded-full border border-white"
-                style={{
-                  left: `${(playerPos.x / 1400) * 100}%`,
-                  top: `${(playerPos.y / 1050) * 100}%`,
-                  transform: "translate(-50%, -50%)",}}/>
-            </div>
-          </div>
         </div>
-
-        <div 
+          <div 
           className={`relative w-full border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]} mx-auto mt-28 mb-32`}
           style={{
             aspectRatio: '4 / 3',
             maxHeight: 'calc(100vh - 240px)',
             background: '#1a202c',
-            maxWidth: '1200px'}}>
-            
-            <div
+            maxWidth: '1200px'
+          }}>
+          <div
             className="absolute inset-0 transition-transform duration-100"
             style={{
-              transform: `translate(${cameraOffset.x}px, ${cameraOffset.y}px)`,}}>
+              transform: `translate(${cameraOffset.x}px, ${cameraOffset.y}px)`,
+            }}>
             <div className="absolute inset-0" onClick={handleCanvasClick}>
               <canvas 
                 ref={canvasRef} 
@@ -601,7 +590,8 @@ export default function GameBoard(props: GameBoardProps) {
                 style={{
                   width: '100%',
                   height: '100%',
-                  objectFit: 'contain'}}/>
+                  objectFit: 'contain'
+                }}/>
             </div>
 
             {!canvasRef.current &&
@@ -612,17 +602,21 @@ export default function GameBoard(props: GameBoardProps) {
                   style={{
                     left: marker.x - 20,
                     top: marker.y - 20,
-                    zIndex: 100,}}>
+                    zIndex: 100,
+                  }}>
                   <div
                     className={`w-10 h-10 border-4 border-gray-800 rounded-lg shadow-xl flex items-center justify-center font-black text-gray-900 text-sm transform hover:scale-110 transition-transform ${styles["marker-pulse"]}`}
-                    style={{ backgroundColor: marker.color }}>
+                    style={{ backgroundColor: marker.color }}
+                  >
                     {marker.id}
                   </div>
                   {nearestQuestion === marker.id && (
                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border-2 border-white animate-bounce">
                       Press [E]
-                    </div>)}
-                </div>))}
+                    </div>
+                  )}
+                </div>
+              ))}
 
             {!canvasRef.current && (
               <div
@@ -630,13 +624,15 @@ export default function GameBoard(props: GameBoardProps) {
                 style={{
                   left: playerPos.x - 32,
                   top: playerPos.y - 32,
-                  zIndex: 101,}}>
+                  zIndex: 101,
+                }}>
                 <div className="relative w-16 h-16">
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-10 bg-[#2196f3] border-2 border-[#1565c0] rounded-sm" />
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6 bg-[#ffcc80] border-2 border-[#ff9800] rounded-full" />
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-3 bg-[#5d4037] border border-[#3e2723] rounded-t-full" />
                 </div>
-              </div>)}
+              </div>
+            )}
           </div>
 
           <div className={`${styles.controlsOverlay}`}>
@@ -662,34 +658,7 @@ export default function GameBoard(props: GameBoardProps) {
               <span className="font-black text-yellow-400 text-lg">{completedLevels.length} / 20</span>
             </div>
           </div>
-        </div>
-
-        <div className="absolute bottom-4 left-4 z-30 bg-gray-900/90 text-white px-4 py-3 rounded-lg border-2 border-gray-700 text-sm font-mono backdrop-blur-sm">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-yellow-400 font-bold">[WASD]</span>
-              <span>= movement</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-yellow-400 font-bold">[E]</span>
-              <span>= action</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-blue-400">Facing:</span>
-              <span className="text-green-400">{playerDirection}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-blue-400">Status:</span>
-              <span className={isMoving ? "text-green-400" : "text-yellow-400"}>
-                {isMoving ? 'moving' : 'idle'}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-blue-400">Frame:</span>
-              <span className="text-purple-400">{animationFrame + 1}/4</span>
-            </div>
-          </div>
-        </div>
+        </div>        
       </div>
     </div>
   )
