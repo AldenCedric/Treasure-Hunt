@@ -526,28 +526,6 @@ export default function GameBoard(props: GameBoardProps) {
   }, [])
 
   const isMobile = useIsMobile()
-  const [isPortrait, setIsPortrait] = useState<boolean>(false)
-
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    const updateOrientation = () => {
-      const portrait = window.matchMedia && window.matchMedia("(orientation: portrait)").matches
-      setIsPortrait(portrait)
-    }
-    updateOrientation()
-    const mql = window.matchMedia("(orientation: portrait)")
-    const onChange = () => updateOrientation()
-    try { mql.addEventListener("change", onChange) } catch { mql.addListener(onChange) }
-    return () => { try { mql.removeEventListener("change", onChange) } catch { mql.removeListener(onChange) } }
-  }, [])
-
-  useEffect(() => {
-    if (!isMobile) return
-    const orientation = (screen as any).orientation
-    if (orientation && orientation.lock) {
-      try { orientation.lock("landscape") } catch { /* ignore */ }
-    }
-  }, [isMobile])
 
   const handleEPress = useCallback((pressed: boolean) => {
     if (pressed) {
@@ -606,7 +584,14 @@ export default function GameBoard(props: GameBoardProps) {
           </div>
         </div>
 
-        <div className={`${styles["map-container"]} relative w-full border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]} mt-20 mb-32`}>
+        <div 
+          className={`relative w-full border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]} mt-20 mb-32`}
+          style={{
+            aspectRatio: '4 / 3',
+            maxHeight: 'calc(100vh - 200px)',
+            background: '#1a202c'
+          }}
+        >
           <div
             className="absolute inset-0 transition-transform duration-100"
             style={{
@@ -614,7 +599,15 @@ export default function GameBoard(props: GameBoardProps) {
             }}
           >
             <div className="absolute inset-0" onClick={handleCanvasClick}>
-              <canvas ref={canvasRef} className="block w-full h-full" />
+              <canvas 
+                ref={canvasRef} 
+                className="block w-full h-full"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain'
+                }}
+              />
             </div>
 
             {!canvasRef.current &&
@@ -651,7 +644,7 @@ export default function GameBoard(props: GameBoardProps) {
                   zIndex: 101,
                 }}
               >
-                <div className="relative w-16 h-16"> {/* Updated size for fallback display */}
+                <div className="relative w-16 h-16">
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-10 bg-[#2196f3] border-2 border-[#1565c0] rounded-sm" />
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6 bg-[#ffcc80] border-2 border-[#ff9800] rounded-full" />
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-3 bg-[#5d4037] border border-[#3e2723] rounded-t-full" />
@@ -659,29 +652,15 @@ export default function GameBoard(props: GameBoardProps) {
               </div>
             )}
           </div>
-          
-          {isMobile && (
-            <div className={`${styles.controlsOverlay}`}>
-              <div className={`${styles.controlsOverlayInner}`}>
-                <div>
-                  <MobileJoystick 
-                  onMove={handleJoystickMove}
-                  onEPress={handleEPress}/>
-                </div>
-                <button
-                  type="button"
-                  aria-label="Action"
-                  onMouseDown={() => handleEPress(true)}
-                  onMouseUp={() => handleEPress(false)}
-                  onTouchStart={() => handleEPress(true)}
-                  onTouchEnd={() => handleEPress(false)}
-                  className="select-none rounded-full bg-gradient-to-b from-orange-600 to-orange-800 text-white font-black text-xl w-16 h-16 border-4 border-orange-900 shadow-xl active:scale-95 transition-transform"
-                >
-                  E
-                </button>
-              </div>
+
+          <div className={`${styles.controlsOverlay}`}>
+            <div className={`${styles.controlsOverlayInner}`}>
+              <MobileJoystick 
+                onMove={handleJoystickMove}
+                onEPress={handleEPress}
+              />
             </div>
-          )}
+          </div>
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 z-30 flex justify-center items-end p-4">

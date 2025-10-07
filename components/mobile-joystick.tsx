@@ -13,36 +13,8 @@ export default function MobileJoystick({ onMove, onEPress }: MobileJoystickProps
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const joystickRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
-  const [isPortrait, setIsPortrait] = useState(false)
 
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    
-    const updateOrientation = () => {
-      const portrait = window.matchMedia("(orientation: portrait)").matches
-      setIsPortrait(portrait)
-    }
-    
-    updateOrientation()
-    
-    const mql = window.matchMedia("(orientation: portrait)")
-    const handleOrientationChange = () => updateOrientation()
-    
-    try { 
-      mql.addEventListener("change", handleOrientationChange) 
-    } catch { 
-      mql.addListener(handleOrientationChange) 
-    }
-    
-    return () => {
-      try { 
-        mql.removeEventListener("change", handleOrientationChange) 
-      } catch { 
-        mql.removeListener(handleOrientationChange) 
-      }
-    }
-  }, [])
-
+  // Mouse controls for PC
   useEffect(() => {
     if (isMobile) return
 
@@ -89,6 +61,7 @@ export default function MobileJoystick({ onMove, onEPress }: MobileJoystickProps
     }
   }, [isDragging, onMove, isMobile])
 
+  // Touch controls for mobile
   useEffect(() => {
     if (!isMobile) return
 
@@ -158,11 +131,8 @@ export default function MobileJoystick({ onMove, onEPress }: MobileJoystickProps
 
   return (
     <>
-      <div className={`fixed z-50 ${
-        isMobile 
-          ? "bottom-8 left-8" 
-          : "bottom-8 left-8"
-      }`}>
+      {/* Joystick */}
+      <div className={`fixed z-50 ${isMobile ? "bottom-8 left-8" : "bottom-8 left-8"}`}>
         <div
           ref={joystickRef}
           className={`relative bg-gray-800/80 rounded-full border-4 border-gray-700 shadow-2xl backdrop-blur-sm ${
@@ -186,11 +156,8 @@ export default function MobileJoystick({ onMove, onEPress }: MobileJoystickProps
         </div>
       </div>
 
-      <div className={`fixed z-50 ${
-        isMobile 
-          ? "bottom-8 right-8" 
-          : "bottom-8 right-8"
-      }`}>
+      {/* E Button */}
+      <div className={`fixed z-50 ${isMobile ? "bottom-8 right-8" : "bottom-8 right-8"}`}>
         <button
           className={`bg-gradient-to-b from-orange-600 to-orange-800 rounded-full border-4 border-orange-900 shadow-2xl flex items-center justify-center text-white font-black active:scale-95 transition-transform duration-200 ${
             isMobile ? "w-20 h-20 text-xl" : "w-16 h-16 text-lg"
@@ -206,21 +173,12 @@ export default function MobileJoystick({ onMove, onEPress }: MobileJoystickProps
         </button>
       </div>
 
+      {/* PC Controls Hint */}
       {!isMobile && (
         <div className="fixed bottom-24 left-8 z-50">
           <div className="bg-blue-500/90 text-blue-900 px-4 py-2 rounded-lg border-2 border-blue-700 shadow-lg text-center max-w-xs">
             <p className="font-bold text-xs">
               🎮 Use joystick or WASD keys
-            </p>
-          </div>
-        </div>
-      )}
-
-      {isMobile && isPortrait && (
-        <div className="fixed top-4 left-0 right-0 z-50 flex justify-center">
-          <div className="bg-yellow-500/90 text-yellow-900 px-6 py-3 rounded-lg border-2 border-yellow-700 shadow-lg text-center max-w-md mx-4">
-            <p className="font-bold text-sm">
-              💡 For better gameplay, rotate your device to landscape mode
             </p>
           </div>
         </div>
