@@ -21,7 +21,6 @@ interface QuestionMarker {
   color: string
 }
 
-// Define player facing directions
 type PlayerDirection = 'north' | 'south' | 'east' | 'west';
 
 export default function GameBoard(props: GameBoardProps) {
@@ -38,20 +37,17 @@ export default function GameBoard(props: GameBoardProps) {
   const cameraClampXRef = useRef({ ...DEFAULT_CAMERA_CLAMP_X })
   const cameraClampYRef = useRef({ ...DEFAULT_CAMERA_CLAMP_Y })
 
-  // Player sprite state
   const [playerDirection, setPlayerDirection] = useState<PlayerDirection>('south')
   const [isMoving, setIsMoving] = useState(false)
   const [animationFrame, setAnimationFrame] = useState(0)
 
-  // Sprite sheet paths for each direction
   const spriteSheets = {
     north: './player-north-sheet.png',
     south: './player-south-sheet.png',
     east: './player-east-sheet.png',
-    west: './player-west-sheet.png'
+    west: './player-west-sheet.png'   
   };
 
-  // Fallback single sprite paths
   const singleSprites = {
     north: './player-north.png',
     south: './player-south.png',
@@ -59,7 +55,6 @@ export default function GameBoard(props: GameBoardProps) {
     west: './player-west.png'
   };
 
-  // Sprite images ref
   const spriteImagesRef = useRef<{ [key in PlayerDirection]: HTMLImageElement | null }>({
     north: null,
     south: null,
@@ -158,7 +153,6 @@ export default function GameBoard(props: GameBoardProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const mapImageRef = useRef<HTMLImageElement | null>(null)
 
-  // Load sprite images
   useEffect(() => {
     const directions: PlayerDirection[] = ['north', 'south', 'east', 'west'];
     directions.forEach(direction => {
@@ -168,7 +162,6 @@ export default function GameBoard(props: GameBoardProps) {
         spriteImagesRef.current[direction] = img;
       };
       img.onerror = () => {
-        // Fallback to single sprite if sheet fails to load
         const fallbackImg = new Image();
         fallbackImg.src = singleSprites[direction];
         fallbackImg.onload = () => {
@@ -190,7 +183,6 @@ export default function GameBoard(props: GameBoardProps) {
     }
   }, [])
 
-  // Animation loop for sprite frames
   useEffect(() => {
     let animationInterval: NodeJS.Timeout;
 
@@ -220,7 +212,6 @@ export default function GameBoard(props: GameBoardProps) {
         e.preventDefault()
         keysRef.current.add(key)
 
-        // Update player direction based on movement
         if (key === "w" || key === "arrowup") setPlayerDirection('north')
         if (key === "s" || key === "arrowdown") setPlayerDirection('south')
         if (key === "a" || key === "arrowleft") setPlayerDirection('west')
@@ -297,41 +288,41 @@ export default function GameBoard(props: GameBoardProps) {
     return false
   }
 
-  // Render player sprite on canvas
   const renderPlayerSprite = (ctx: CanvasRenderingContext2D) => {
-    const spriteSize = 32;
+    const spriteSize = 64;
     const currentSprite = spriteImagesRef.current[playerDirection];
 
     ctx.save();
     ctx.translate(playerPosRef.current.x, playerPosRef.current.y);
 
     if (currentSprite && currentSprite.complete) {
-      // Check if it's a sprite sheet (width > height indicates multiple frames)
-      const isSpriteSheet = currentSprite.width > currentSprite.height;
+      const isSpriteSheet = currentSprite.width > spriteSize;
       
       if (isSpriteSheet && isMoving) {
-        // Animated sprite sheet version - only animate when moving
-        const frameWidth = currentSprite.width / 4; // Assuming 4 frames
+
+        const frameWidth = currentSprite.width / 4;
+        const frameHeight = spriteSize;
+        
         ctx.drawImage(
           currentSprite,
-          animationFrame * frameWidth, 0, // source x, y
-          frameWidth, spriteSize, // source width, height
-          -spriteSize/2, -spriteSize/2, // destination x, y
-          spriteSize, spriteSize // destination width, height
+          animationFrame * frameWidth, 0,
+          frameWidth, frameHeight,
+          -spriteSize/2, -spriteSize/2,
+          spriteSize, spriteSize
         );
       } else {
-        // Single sprite or first frame of sprite sheet when not moving
         const sourceWidth = isSpriteSheet ? currentSprite.width / 4 : currentSprite.width;
+        const sourceHeight = isSpriteSheet ? spriteSize : currentSprite.height;
+        
         ctx.drawImage(
           currentSprite,
-          0, 0, // source x, y (always use first frame when not moving)
-          sourceWidth, spriteSize, // source width, height
-          -spriteSize/2, -spriteSize/2, // destination x, y
-          spriteSize, spriteSize // destination width, height
+          0, 0,
+          sourceWidth, sourceHeight,
+          -spriteSize/2, -spriteSize/2,
+          spriteSize, spriteSize
         );
       }
     } else {
-      // Fallback: Simple colored rectangle (original behavior)
       ctx.fillStyle = "#2196f3"
       ctx.globalAlpha = 1.0
       ctx.fillRect(-6, -8, 12, 16)
@@ -375,7 +366,6 @@ export default function GameBoard(props: GameBoardProps) {
         nowMoving = true;
       }
 
-      // Update moving state
       if (wasMoving !== nowMoving) {
         setIsMoving(nowMoving);
       }
@@ -441,8 +431,7 @@ export default function GameBoard(props: GameBoardProps) {
               
               const isNearby = nearestQuestion === marker.id
               const radius = 24
-              
-              // Draw question marker base (solid color)
+
               const baseColor = marker.color || pastelColor(marker.id)
               ctx.fillStyle = baseColor
               ctx.globalAlpha = 0
@@ -474,8 +463,7 @@ export default function GameBoard(props: GameBoardProps) {
               ctx.beginPath()
               ctx.arc(0, 0, radius, 0, Math.PI * 2)
               ctx.fill()
-              
-              // Number text 0 aplha visibilty for more challenge
+
               ctx.fillStyle = "#white"
               ctx.globalAlpha = 0
               ctx.font = "bold 16px segoe ui"
@@ -492,7 +480,6 @@ export default function GameBoard(props: GameBoardProps) {
               ctx.restore()
             }
 
-            // Render player sprite instead of simple rectangle
             renderPlayerSprite(ctx);
           }
         }
@@ -659,15 +646,15 @@ export default function GameBoard(props: GameBoardProps) {
               <div
                 className="absolute transition-all duration-100"
                 style={{
-                  left: playerPos.x - 12,
-                  top: playerPos.y - 16,
+                  left: playerPos.x - 32,
+                  top: playerPos.y - 32,
                   zIndex: 101,
                 }}
               >
-                <div className="relative w-6 h-8">
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-5 bg-[#2196f3] border-2 border-[#1565c0] rounded-sm" />
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#ffcc80] border-2 border-[#ff9800] rounded-full" />
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-1.5 bg-[#5d4037] border border-[#3e2723] rounded-t-full" />
+                <div className="relative w-16 h-16"> {/* Updated size for fallback display */}
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-10 bg-[#2196f3] border-2 border-[#1565c0] rounded-sm" />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6 bg-[#ffcc80] border-2 border-[#ff9800] rounded-full" />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-3 bg-[#5d4037] border border-[#3e2723] rounded-t-full" />
                 </div>
               </div>
             )}
@@ -715,6 +702,7 @@ export default function GameBoard(props: GameBoardProps) {
           <div>[E] - action</div>
           <div>Facing: {playerDirection}</div>
           <div>State: {isMoving ? 'Moving' : 'Idle'}</div>
+          <div>Frame: {animationFrame + 1}/4</div>
         </div>
       </div>
     </div>
