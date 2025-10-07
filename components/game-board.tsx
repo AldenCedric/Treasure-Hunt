@@ -45,7 +45,7 @@ export default function GameBoard(props: GameBoardProps) {
     north: './player-north-sheet.png',
     south: './player-south-sheet.png',
     east: './player-east-sheet.png',
-    west: './player-west-sheet.png'   
+    west: './player-west-sheet.png'
   };
 
   const singleSprites = {
@@ -664,7 +664,9 @@ export default function GameBoard(props: GameBoardProps) {
             <div className={`${styles.controlsOverlay}`}>
               <div className={`${styles.controlsOverlayInner}`}>
                 <div>
-                  <MobileJoystick onMove={handleJoystickMove} />
+                  <MobileJoystick 
+                  onMove={handleJoystickMove}
+                  onEPress={handleEPress}/>
                 </div>
                 <button
                   type="button"
