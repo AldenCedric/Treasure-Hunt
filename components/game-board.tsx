@@ -581,8 +581,6 @@ export default function GameBoard(props: GameBoardProps) {
           <div>[E] - action</div>
         </div>
       </div>
-
-      {!isMobile && <MobileJoystick onMove={handleJoystickMove} />}
     </div>
   )
 }
