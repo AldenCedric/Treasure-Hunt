@@ -2,30 +2,37 @@
   width: 0.25rem;
   height: 0.25rem;
   border-radius: 9999px;
-  background-color: #81d4fa; /* bg-cyan-300 equivalent */
+  background-color: #81d4fa;
   will-change: transform;
-  transform: translate3d(0,0,0);
+  transform: translate3d(0, 0, 0);
 }
 
 @keyframes bob0 {
-  0% { transform: translateY(0); }
+  0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
-  100% { transform: translateY(0); }
-}
-@keyframes bob1 {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-  100% { transform: translateY(0); }
-}
-@keyframes bob2 {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-  100% { transform: translateY(0); }
 }
 
-.bob0 { animation-name: bob0; animation-timing-function: ease-in-out; animation-iteration-count: infinite; animation-duration: 2s; }
-.bob1 { animation-name: bob1; animation-timing-function: ease-in-out; animation-iteration-count: infinite; animation-duration: 3s; }
-.bob2 { animation-name: bob2; animation-timing-function: ease-in-out; animation-iteration-count: infinite; animation-duration: 4s; }
+@keyframes bob1 {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes bob2 {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.bob0 { 
+  animation: bob0 2s ease-in-out infinite; 
+}
+
+.bob1 { 
+  animation: bob1 3s ease-in-out infinite; 
+}
+
+.bob2 { 
+  animation: bob2 4s ease-in-out infinite; 
+}
 
 .delay0 { animation-delay: 0s; }
 .delay1 { animation-delay: 0.08s; }
@@ -48,7 +55,6 @@
 .delay18 { animation-delay: 1.44s; }
 .delay19 { animation-delay: 1.52s; }
 
-/* Low animation mode: pause or greatly reduce animations for performance */
 .lowAnimations .bg-dot,
 .lowAnimations .bob0,
 .lowAnimations .bob1,
@@ -56,26 +62,35 @@
   animation-play-state: paused !important;
   opacity: 0.85;
 }
+
 .lowAnimations .fountain-bob {
   animation-play-state: paused !important;
   transform: scaleY(1) !important;
 }
 
 @keyframes fountain-bob {
-  0% { transform: scaleY(1); }
+  0%, 100% { transform: scaleY(1); }
   50% { transform: scaleY(1.04); }
-  100% { transform: scaleY(1); }
 }
-.fountain-bob { transform-origin: center; animation-name: fountain-bob; animation-duration: 3s; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
 
-/* Map frame and parchment look to mimic the provided treasure map artwork */
+.fountain-bob { 
+  transform-origin: center; 
+  animation: fountain-bob 3s ease-in-out infinite; 
+}
+
 .map-frame {
-  box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 0 8px rgba(59,53,44,0.9);
-  background: linear-gradient(180deg, rgba(255,250,240,0.9), rgba(245,235,210,0.95));
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.6), 
+    inset 0 0 0 8px rgba(59, 53, 44, 0.9);
+  background: linear-gradient(
+    180deg, 
+    rgba(255, 250, 240, 0.9), 
+    rgba(245, 235, 210, 0.95)
+  );
 }
 
 .map-image {
-  image-rendering: -webkit-optimize-contrast; /* keep map crisp */
+  image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   will-change: transform;
 }
@@ -86,17 +101,13 @@
   pointer-events: none;
 }
 
-/* Question marker fade/pulse */
-@keyframes fadePulse {
-  0% { opacity: 0.75; }
+@keyframes marker-pulse {
+  0%, 100% { opacity: 0.75; }
   50% { opacity: 1; }
-  100% { opacity: 0.75; }
 }
+
 .marker-pulse {
-  animation-name: fadePulse;
-  animation-duration: 3s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
+  animation: marker-pulse 3s ease-in-out infinite;
 }
 
 .lowAnimations .marker-pulse {
@@ -104,7 +115,7 @@
   opacity: 0.9 !important;
 }
 
-/* Responsive map container to better fit mobile screens */
+/* Map container responsive layout */
 .map-container {
   width: 100%;
   max-width: 1120px;
@@ -112,20 +123,20 @@
   box-sizing: border-box;
 }
 
-/* Desktop/tablet: keep 4:3 aspect ratio for consistent framing */
+/* Desktop/tablet: 4:3 aspect ratio */
 @media (min-width: 640px) {
   .map-container {
     aspect-ratio: 4 / 3;
   }
 }
 
-/* Mobile: use available viewport height so map fills the screen above controls */
+/* Mobile: adaptive height for controls */
 @media (max-width: 639px) {
   .map-container {
-    height: calc(100vh - 220px); /* leave space for joystick / controls */
+    height: calc(100vh - 220px);
     border-radius: 0.5rem;
   }
-  /* ensure canvas scales to container on mobile */
+  
   .map-container canvas {
     width: 100% !important;
     height: 100% !important;
@@ -133,17 +144,17 @@
   }
 }
 
-/* Mobile landscape helper: rotate viewport if needed as a fallback when lock fails */
-.mobileLandscapeWrapper {
+/* Mobile landscape orientation helper */
+.mobile-landscape-wrapper {
   position: relative;
-  width: 100vh; /* swap dimensions */
+  width: 100vh;
   height: 100vw;
   transform: rotate(90deg);
   transform-origin: left top;
   overflow: hidden;
 }
 
-.mobileLandscapeInner {
+.mobile-landscape-inner {
   position: absolute;
   top: 0;
   left: 0;
@@ -151,13 +162,14 @@
   height: 100vh;
 }
 
-/* Overlay controls inside the game viewport */
-.controlsOverlay {
+/* Mobile controls overlay */
+.controls-overlay {
   position: absolute;
   inset: 0;
-  pointer-events: none; /* allow canvas interactions except on buttons */
+  pointer-events: none;
 }
-.controlsOverlayInner {
+
+.controls-overlay-inner {
   position: absolute;
   left: 0;
   right: 0;
@@ -168,6 +180,7 @@
   gap: 12px;
   padding: 12px;
 }
-.controlsOverlay button {
-  pointer-events: auto; /* enable clicks */
+
+.controls-overlay button {
+  pointer-events: auto;
 }

@@ -8,55 +8,62 @@ interface InstructionsScreenProps {
 
 export default function InstructionsScreen({ onBegin }: InstructionsScreenProps) {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4">
-      <div className="max-w-6xl w-full grid md:grid-cols-2 gap-8 items-center">
-        {/* Instructions Scroll */}
-        <div className="parchment rounded-3xl p-8 shadow-2xl border-4 border-amber-900 relative">
-          {/* Scroll top decoration */}
-          <div className="absolute -top-4 left-0 right-0 h-8 bg-gradient-to-b from-amber-800 to-amber-700 rounded-t-3xl" />
+    <div className="min-h-screen w-full flex items-center justify-center p-4 relative">
+      
+      <div className="absolute inset-0 opacity-30">
+        <img src="/treasure-island-map-with-palm-trees-and-paths.jpg" alt="" className="w-full h-full object-cover" />
+      </div>
+      
+      <div className="max-w-6xl w-full grid md:grid-cols-2 gap-8 items-center relative z-10">
 
+        <div className="parchment rounded-3xl p-8 shadow-2xl border-8 border-amber-900 relative overflow-hidden">
+          
+          <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-amber-800 to-transparent opacity-50" />
+          
           <div className="relative">
-            <h2 className="text-4xl font-black text-amber-950 mb-6 text-center [text-shadow:_2px_2px_0_rgb(255_255_255_/_30%)]">
+            <h2 className="text-4xl md:text-5xl font-black text-center text-amber-950 mb-8 [text-shadow:_2px_2px_0_rgb(255_255_255_/_30%)]">
               Instructions
             </h2>
 
-            <ol className="space-y-4 text-amber-950 text-lg leading-relaxed">
-              <li className="flex gap-3">
-                <span className="font-black text-2xl">1.</span>
-                <span>Click the questions button at the left part to reveal the question.</span>
+            <ol className="space-y-6 text-amber-950 text-lg md:text-xl leading-relaxed">
+              <li className="flex gap-4 items-start">
+                <span className="font-black text-2xl flex-shrink-0">1.</span>
+                <span>Move your pirate using WASD keys or on-screen controls to explore the treasure map.</span>
               </li>
-              <li className="flex gap-3">
-                <span className="font-black text-2xl">2.</span>
-                <span>
-                  If they got the correct answer, click the &quot;Click to move&quot; button at the bottom left corner to move the
-                  pirate.
-                </span>
+              <li className="flex gap-4 items-start">
+                <span className="font-black text-2xl flex-shrink-0">2.</span>
+                <span>Approach question markers and press [E] to reveal questions when you get close.</span>
               </li>
-              <li className="flex gap-3">
-                <span className="font-black text-2xl">3.</span>
-                <span>If they finally reach the treasure chest, click the treasure chest to reveal what&apos;s inside.</span>
+              <li className="flex gap-4 items-start">
+                <span className="font-black text-2xl flex-shrink-0">3.</span>
+                <span>Answer questions correctly to collect treasures and progress through the game.</span>
+              </li>
+              <li className="flex gap-4 items-start">
+                <span className="font-black text-2xl flex-shrink-0">4.</span>
+                <span>Complete all 20 questions to find the ultimate treasure!</span>
               </li>
             </ol>
 
-            {/* Treasure chest decoration */}
-            <div className="absolute -bottom-6 -right-6 text-7xl opacity-80">💰</div>
+            <div className="absolute -bottom-6 -right-6 text-7xl opacity-80">🗺️</div>
           </div>
 
-          {/* Scroll bottom decoration */}
-          <div className="absolute -bottom-4 left-0 right-0 h-8 bg-gradient-to-t from-amber-800 to-amber-700 rounded-b-3xl" />
+          <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-amber-800 to-transparent opacity-50" />
         </div>
 
-        {/* Game Preview */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div className="relative">
-            <img src="/treasure-hunt-game-board-with-islands-and-paths.jpg" alt="Game Preview" className="w-full rounded-2xl shadow-2xl" />
+            <img 
+              src="/treasure-hunt-game-board-with-islands-and-paths.jpg" 
+              alt="Game Preview" 
+              className="w-full rounded-2xl shadow-2xl border-4 border-amber-800"
+            />
+            <div className="absolute inset-0 rounded-2xl border-4 border-amber-400 opacity-30 pointer-events-none" />
           </div>
 
           <Button
             onClick={onBegin}
             size="lg"
-            className="w-full bg-gradient-to-b from-orange-500 to-orange-700 hover:from-orange-600 hover:to-orange-800 text-white font-black text-3xl py-8 rounded-2xl shadow-2xl border-4 border-orange-900 transform hover:scale-105 transition-transform"
-          >
+            className="w-full bg-gradient-to-b from-green-600 to-green-800 hover:from-green-700 hover:to-green-900 text-white font-black text-2xl md:text-3xl py-6 md:py-8 rounded-xl shadow-2xl border-4 border-green-950 transform hover:scale-105 transition-transform duration-200">
             START
           </Button>
         </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -9,6 +9,7 @@ interface QuestionScreenProps {
   onCorrectAnswer: () => void
   onBack: () => void
   onWrong?: (level: number) => void
+  completedLevels: number[]
 }
 
 const questions = [
@@ -34,12 +35,21 @@ const questions = [
   { question: "How many wheels does a bicycle have?", answer: "2" },
 ]
 
-export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong }: QuestionScreenProps) {
+export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong, completedLevels }: QuestionScreenProps) {
   const [userAnswer, setUserAnswer] = useState("")
   const [showAnswer, setShowAnswer] = useState(false)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
+  const [wrongAttempts, setWrongAttempts] = useState(0)
 
   const currentQuestion = questions[level - 1] || questions[0]
+  const showRevealButton = wrongAttempts >= 3
+
+  // Check if this level is already completed and auto-return to map
+  useEffect(() => {
+    if (completedLevels.includes(level)) {
+      onBack()
+    }
+  }, [level, completedLevels, onBack])
 
   const handleRevealAnswer = () => {
     setShowAnswer(true)
@@ -54,20 +64,28 @@ export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong
         onCorrectAnswer()
       }, 1500)
     } else {
-      // mark this level as wrong (user clicked check and was incorrect at least once)
+      setWrongAttempts(prev => prev + 1)
       if (typeof onWrong === "function") onWrong(level)
     }
+  }
+  // If level is already completed, show loading or return null
+  if (completedLevels.includes(level)) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="text-center">
+          <p className="text-2xl text-white">Returning to map...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background */}
       <div className="absolute inset-0 opacity-20">
         <img src="/treasure-map-background.jpg" alt="" className="w-full h-full object-cover" />
       </div>
 
       <div className="relative z-10 max-w-4xl w-full">
-        {/* Back Button */}
         <Button
           onClick={onBack}
           variant="outline"
@@ -76,14 +94,11 @@ export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong
           ← Back to Map
         </Button>
 
-        {/* Parchment Scroll */}
         <div className="parchment rounded-3xl shadow-2xl border-8 border-amber-900 relative overflow-hidden">
-          {/* Scroll top curl */}
           <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-amber-800 to-transparent opacity-50" />
           <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-amber-800 to-transparent opacity-50" />
 
           <div className="p-12 md:p-16 space-y-8">
-            {/* Treasure Hunt Logo */}
             <div className="text-center mb-8">
               <h2 className="text-4xl md:text-5xl font-black">
                 <span className="text-yellow-400 [text-shadow:_2px_2px_0_rgb(139_69_19)]">Treasure</span>{" "}
@@ -92,18 +107,15 @@ export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong
               <div className="text-2xl mt-2">🗝️</div>
             </div>
 
-            {/* Question Number */}
-            <h1 className="text-5xl md:text-6xl font-black text-center text-amber-950 [text-shadow:_2px_2px_0_rgb(255_255_255_/_30%)]">
+            <h1 className="text-5xl md:text-3xl font-black text-center text-amber-950 [text-shadow:_2px_2px_0_rgb(255_255_255_/_30%)]">
               Question # {level}
             </h1>
 
-            {/* Question Text */}
             <div className="text-center space-y-6">
-              <p className="text-3xl md:text-4xl font-bold text-amber-950 leading-relaxed">
+              <p className="text-2xl md:text-1xl font-bold text-amber-950 leading-relaxed">
                 {currentQuestion.question}
               </p>
 
-              {/* Answer Input */}
               <div className="max-w-md mx-auto">
                 <Input
                   type="text"
@@ -119,7 +131,6 @@ export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong
                 />
               </div>
 
-              {/* Feedback */}
               {isCorrect !== null && (
                 <div className={`text-3xl font-black ${isCorrect ? "text-green-700" : "text-red-700"}`}>
                   {isCorrect ? "✓ Correct! Moving pirate..." : "✗ Try again!"}
@@ -127,26 +138,24 @@ export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong
               )}
             </div>
 
-            {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
-              <Button
-                onClick={handleRevealAnswer}
-                size="lg"
-                className="bg-gradient-to-b from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-black text-2xl px-12 py-6 rounded-xl shadow-2xl border-4 border-red-950 transform hover:scale-105 transition-transform"
-              >
-                Reveal Answer
-              </Button>
-
+              {showRevealButton && (
+                <Button
+                  onClick={handleRevealAnswer}
+                  size="lg"
+                  className="bg-gradient-to-b from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-black text-2xl px-12 py-6 rounded-xl shadow-2xl border-4 border-red-950 transform hover:scale-105 transition-transform">
+                  Reveal Answer
+                </Button>
+              )}
+              
               <Button
                 onClick={handleCheckAnswer}
                 size="lg"
-                className="bg-gradient-to-b from-green-600 to-green-800 hover:from-green-700 hover:to-green-900 text-white font-black text-2xl px-12 py-6 rounded-xl shadow-2xl border-4 border-green-950 transform hover:scale-105 transition-transform"
-              >
-                Check Answer
+                className="bg-gradient-to-b from-green-600 to-green-800 hover:from-green-700 hover:to-green-900 text-white font-black text-2xl px-12 py-6 rounded-xl shadow-2xl border-4 border-green-950 transform hover:scale-105 transition-transform">
+                Submit Answer
               </Button>
             </div>
 
-            {/* Show Answer */}
             {showAnswer && (
               <div className="text-center p-6 bg-amber-100 rounded-2xl border-4 border-amber-800">
                 <p className="text-2xl font-black text-amber-950">Answer: {currentQuestion.answer}</p>

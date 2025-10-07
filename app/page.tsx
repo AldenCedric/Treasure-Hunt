@@ -14,7 +14,7 @@ export default function TreasureHuntPage() {
   const [completedLevels, setCompletedLevels] = useState<number[]>([])
   const [piratePosition, setPiratePosition] = useState(1)
   const [username, setUsername] = useState<string | null>(null)
-  const [avatar, setAvatar] = useState<string | undefined>(undefined)
+  const [avatar, setAvatar] = useState<string | null>(null)
   const [wrongLevels, setWrongLevels] = useState<number[]>([])
 
   const handleStart = () => {
@@ -22,17 +22,16 @@ export default function TreasureHuntPage() {
   }
 
   const handleBeginGame = () => {
-    // after reading instructions, show login to collect username
     setScreen("login")
   }
 
   const handleLogin = (name: string, av?: string) => {
     setUsername(name)
-    setAvatar(av)
+    setAvatar(av || null)
     try {
       localStorage.setItem("thq_user", JSON.stringify({ name, avatar: av }))
     } catch {
-      // ignore
+      // ignore errors
     }
     setScreen("game")
   }
@@ -51,11 +50,11 @@ export default function TreasureHuntPage() {
 
   const handleAnswerCorrect = () => {
     if (!completedLevels.includes(currentLevel)) {
-      setCompletedLevels([...completedLevels, currentLevel])
+      setCompletedLevels(prev => [...prev, currentLevel])
     }
 
     if (piratePosition < 20) {
-      setPiratePosition(piratePosition + 1)
+      setPiratePosition(prev => prev + 1)
     }
 
     if (completedLevels.length + 1 >= 20) {
@@ -69,11 +68,26 @@ export default function TreasureHuntPage() {
     setScreen("game")
   }
 
+  const handleRestart = () => {
+    setScreen("welcome")
+    setCurrentLevel(1)
+    setCompletedLevels([])
+    setPiratePosition(1)
+    setWrongLevels([])
+    setUsername(null)
+    setAvatar(null)
+  }
+
   return (
     <main className="min-h-screen w-full">
       {screen === "welcome" && <WelcomeScreen onStart={handleStart} />}
       {screen === "instructions" && <InstructionsScreen onBegin={handleBeginGame} />}
-      {screen === "login" && <LoginScreen onLogin={handleLogin} onBack={() => setScreen("instructions")} />}
+      {screen === "login" && (
+        <LoginScreen 
+          onLogin={handleLogin} 
+          onBack={() => setScreen("instructions")} 
+        />
+      )}
       {screen === "game" && (
         <GameBoard
           currentLevel={currentLevel}
@@ -83,22 +97,20 @@ export default function TreasureHuntPage() {
         />
       )}
       {screen === "question" && (
-        <QuestionScreen level={currentLevel} onCorrectAnswer={handleAnswerCorrect} onBack={handleBackToGame} onWrong={handleMarkWrong} />
+        <QuestionScreen 
+          level={currentLevel} 
+          onCorrectAnswer={handleAnswerCorrect} 
+          onBack={handleBackToGame} 
+          onWrong={handleMarkWrong}
+          completedLevels={completedLevels}
+        />
       )}
       {screen === "victory" && (
         <VictoryScreen
           username={username}
+          avatar={avatar}
           completedLevels={completedLevels}
-          // pass wrongLevels so VictoryScreen can show exactly which levels were marked wrong
-          // (these are levels where the user clicked Check Answer and it was incorrect at least once)
-          // This is cumulative and not cleared when user later answers correctly.
-          onRestart={() => {
-            setScreen("welcome")
-            setCurrentLevel(1)
-            setCompletedLevels([])
-            setPiratePosition(1)
-            setWrongLevels([])
-          }}
+          onRestart={handleRestart}
           wrongLevels={wrongLevels}
         />
       )}
