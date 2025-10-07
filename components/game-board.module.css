@@ -1,3 +1,39 @@
+.game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.camera-view {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.1s ease-out;
+}
+
+.ui-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.canvas-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.canvas-responsive {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
 .bg-dot {
   width: 0.25rem;
   height: 0.25rem;
@@ -22,17 +58,24 @@
   50% { transform: translateY(-8px); }
 }
 
-.bob0 { 
-  animation: bob0 2s ease-in-out infinite; 
+@keyframes fountain-bob {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.04); }
 }
 
-.bob1 { 
-  animation: bob1 3s ease-in-out infinite; 
+@keyframes marker-pulse {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
 }
 
-.bob2 { 
-  animation: bob2 4s ease-in-out infinite; 
+.bob0 { animation: bob0 2s ease-in-out infinite; }
+.bob1 { animation: bob1 3s ease-in-out infinite; }
+.bob2 { animation: bob2 4s ease-in-out infinite; }
+.fountain-bob { 
+  transform-origin: center; 
+  animation: fountain-bob 3s ease-in-out infinite; 
 }
+.marker-pulse { animation: marker-pulse 3s ease-in-out infinite; }
 
 .delay0 { animation-delay: 0s; }
 .delay1 { animation-delay: 0.08s; }
@@ -55,27 +98,38 @@
 .delay18 { animation-delay: 1.44s; }
 .delay19 { animation-delay: 1.52s; }
 
+.lowAnimations * {
+  animation-duration: 0.001s !important;
+  transition-duration: 0.001s !important;
+}
+
 .lowAnimations .bg-dot,
 .lowAnimations .bob0,
 .lowAnimations .bob1,
-.lowAnimations .bob2 {
+.lowAnimations .bob2,
+.lowAnimations .fountain-bob,
+.lowAnimations .marker-pulse {
   animation-play-state: paused !important;
+}
+
+.lowAnimations .bg-dot {
+  animation: none !important;
   opacity: 0.85;
 }
 
 .lowAnimations .fountain-bob {
-  animation-play-state: paused !important;
   transform: scaleY(1) !important;
 }
 
-@keyframes fountain-bob {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(1.04); }
+.lowAnimations .marker-pulse {
+  opacity: 0.9 !important;
 }
 
-.fountain-bob { 
-  transform-origin: center; 
-  animation: fountain-bob 3s ease-in-out infinite; 
+.map-container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .map-frame {
@@ -101,36 +155,49 @@
   pointer-events: none;
 }
 
-@keyframes marker-pulse {
-  0%, 100% { opacity: 0.75; }
-  50% { opacity: 1; }
-}
-
-.marker-pulse {
-  animation: marker-pulse 3s ease-in-out infinite;
-}
-
-.lowAnimations .marker-pulse {
-  animation-play-state: paused !important;
-  opacity: 0.9 !important;
-}
-
-/* Map container responsive layout */
-.map-container {
+.aspect-ratio-container {
+  position: relative;
   width: 100%;
-  max-width: 1120px;
-  margin: 0 auto;
-  box-sizing: border-box;
+  height: 0;
+  padding-bottom: 75%;
 }
 
-/* Desktop/tablet: 4:3 aspect ratio */
+.aspect-ratio-container canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.controlsOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  pointer-events: none;
+  padding: 20px;
+}
+
+.controlsOverlayInner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.controlsOverlayInner > * {
+  pointer-events: auto;
+}
+
 @media (min-width: 640px) {
   .map-container {
     aspect-ratio: 4 / 3;
   }
 }
 
-/* Mobile: adaptive height for controls */
 @media (max-width: 639px) {
   .map-container {
     height: calc(100vh - 220px);
@@ -142,30 +209,7 @@
     height: 100% !important;
     display: block;
   }
-}
-
-.controlsOverlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 40;
-  pointer-events: none;
-}
-
-.controlsOverlayInner {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding: 20px;
-  pointer-events: none;
-}
-
-.controlsOverlayInner > * {
-  pointer-events: auto;
-}
-
-@media (max-width: 768px) {
+  
   .controlsOverlay {
     padding: 16px;
   }
@@ -185,11 +229,11 @@
   }
 }
 
-.canvas-responsive {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
+@media (max-width: 639px) and (orientation: portrait) {
+  .map-container {
+    max-height: 60vh;
+    aspect-ratio: 3 / 4;
+  }
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
@@ -207,34 +251,29 @@
   }
 }
 
-@media (max-width: 639px) and (orientation: portrait) {
-  .map-container {
-    max-height: 60vh;
-    aspect-ratio: 3 / 4;
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .map-image {
+    image-rendering: crisp-edges;
   }
 }
 
-.aspect-ratio-container {
-  position: relative;
-  width: 100%;
-  height: 0;
-  padding-bottom: 75%;
+@media (prefers-reduced-motion: reduce) {
+  .bob0,
+  .bob1,
+  .bob2,
+  .fountain-bob,
+  .marker-pulse {
+    animation: none !important;
+  }
+  
+  .bg-dot {
+    animation: none !important;
+  }
 }
 
-.aspect-ratio-container canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.lowAnimations * {
-  animation-duration: 0.001s !important;
-  transition-duration: 0.001s !important;
-}
-
-.lowAnimations .bg-dot {
-  animation: none !important;
+@media (pointer: coarse) {
+  .controlsOverlayInner > * {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
