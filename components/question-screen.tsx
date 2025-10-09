@@ -227,13 +227,11 @@ const questions: Question[] = [
 
 export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong, completedLevels }: QuestionScreenProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<keyof Question['choices'] | null>(null)
-  const [showAnswer, setShowAnswer] = useState(false)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [wrongAttempts, setWrongAttempts] = useState(0)
   const [isChecking, setIsChecking] = useState(false)
 
   const currentQuestion = questions[level - 1]
-  const showRevealButton = wrongAttempts >= 3
 
   useEffect(() => {
     if (completedLevels.includes(level)) {
@@ -243,15 +241,10 @@ export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong
 
   useEffect(() => {
     setSelectedAnswer(null)
-    setShowAnswer(false)
     setIsCorrect(null)
     setWrongAttempts(0)
     setIsChecking(false)
   }, [level])
-
-  const handleRevealAnswer = () => {
-    setShowAnswer(true)
-  }
 
   const handleSelectAnswer = (choice: keyof Question['choices']) => {
     if (isChecking || isCorrect !== null) return
@@ -357,17 +350,7 @@ export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong
               )}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
-              {showRevealButton && (
-                <Button
-                  onClick={handleRevealAnswer}
-                  disabled={isChecking}
-                  size="lg"
-                  className="bg-gradient-to-b from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-black text-2xl px-12 py-6 rounded-xl shadow-2xl border-4 border-red-950 transform hover:scale-105 transition-transform">
-                  Reveal Answer
-                </Button>
-              )}
-              
+            <div className="flex justify-center items-center pt-8">
               <Button
                 onClick={handleCheckAnswer}
                 disabled={selectedAnswer === null || isChecking}
@@ -376,14 +359,6 @@ export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong
                 {isChecking ? "Checking..." : "Submit Answer"}
               </Button>
             </div>
-
-            {showAnswer && (
-              <div className="text-center p-6 bg-amber-100 rounded-2xl border-4 border-amber-800">
-                <p className="text-2xl font-black text-amber-950">
-                  Correct Answer: {currentQuestion.correctAnswer.toUpperCase()}. {currentQuestion.choices[currentQuestion.correctAnswer]}
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </div>
