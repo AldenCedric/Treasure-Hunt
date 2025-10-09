@@ -152,7 +152,6 @@ export default function VictoryScreen({
           <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-amber-800 to-transparent opacity-50" />
         </div>
 
-        {/* Answer Reveals Section */}
         <div className="parchment rounded-3xl p-8 md:p-12 shadow-2xl border-8 border-amber-900 relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-amber-800 to-transparent opacity-50" />
           
@@ -188,7 +187,6 @@ export default function VictoryScreen({
           <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-amber-800 to-transparent opacity-50" />
         </div>
 
-        {/* Play Again Button */}
         <Button
           onClick={onRestart}
           size="lg"

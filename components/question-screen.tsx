@@ -295,8 +295,7 @@ export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong
         <Button
           onClick={onBack}
           variant="outline"
-          className="mb-4 bg-amber-100 border-2 border-amber-800 text-amber-950 font-bold hover:bg-amber-200"
-        >
+          className="mb-4 bg-amber-100 border-2 border-amber-800 text-amber-950 font-bold hover:bg-amber-200">
           ← Back to Map
         </Button>
 

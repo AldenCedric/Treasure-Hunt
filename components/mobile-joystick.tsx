@@ -126,8 +126,7 @@ export default function MobileJoystick({ onMove, onEPress }: MobileJoystickProps
             }`}
             onMouseDown={!isMobile ? handleInteractionStart : undefined}
             onTouchStart={isMobile ? handleInteractionStart : undefined}
-            onContextMenu={handleContextMenu}
-          >
+            onContextMenu={handleContextMenu}>
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-700 to-gray-900" />
 
             <div className="absolute inset-0 rounded-full flex items-center justify-center">
@@ -158,8 +157,7 @@ export default function MobileJoystick({ onMove, onEPress }: MobileJoystickProps
             onTouchStart={isMobile ? handleActionPress : undefined}
             onTouchEnd={isMobile ? handleActionRelease : undefined}
             onContextMenu={handleContextMenu}
-            aria-label="Interact"
-          >
+            aria-label="Interact">
             E
           </button>
         </div>

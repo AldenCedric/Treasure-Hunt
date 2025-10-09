@@ -618,14 +618,12 @@ export default function GameBoard(props: GameBoardProps) {
             maxHeight: 'calc(100vh - 240px)',
             background: '#1a202c',
             maxWidth: '1024px'
-          }}
-        >
+          }}>
           <div
             className="absolute inset-0 transition-transform duration-100"
             style={{
               transform: `translate(${cameraOffset.x}px, ${cameraOffset.y}px)`,
-            }}
-          >
+            }}>
             <div className="absolute inset-0" onClick={handleCanvasClick}>
               <canvas 
                 ref={canvasRef} 
@@ -634,8 +632,7 @@ export default function GameBoard(props: GameBoardProps) {
                   width: '100%',
                   height: '100%',
                   objectFit: 'contain'
-                }}
-              />
+                }}/>
             </div>
 
             {!canvasRef.current &&
@@ -652,12 +649,10 @@ export default function GameBoard(props: GameBoardProps) {
                       top: `${relativeY}%`,
                       transform: 'translate(-50%, -50%)',
                       zIndex: 100,
-                    }}
-                  >
+                    }}>
                     <div
                       className={`w-10 h-10 border-4 border-gray-800 rounded-lg shadow-xl flex items-center justify-center font-black text-gray-900 text-sm transform hover:scale-110 transition-transform ${styles["marker-pulse"]}`}
-                      style={{ backgroundColor: marker.color }}
-                    >
+                      style={{ backgroundColor: marker.color }}>
                       {marker.id}
                     </div>
                     {nearestQuestion === marker.id && (
@@ -677,8 +672,7 @@ export default function GameBoard(props: GameBoardProps) {
                   top: `${(playerPos.y / MAP_HEIGHT) * 100}%`,
                   transform: 'translate(-50%, -50%)',
                   zIndex: 101,
-                }}
-              >
+                }}>
                 <div className="relative w-16 h-16">
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-10 bg-[#2196f3] border-2 border-[#1565c0] rounded-sm" />
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6 bg-[#ffcc80] border-2 border-[#ff9800] rounded-full" />
@@ -711,14 +705,6 @@ export default function GameBoard(props: GameBoardProps) {
               <span className="font-black text-yellow-400 text-lg">{completedLevels.length} / 20</span>
             </div>
           </div>
-        </div>
-
-        <div className="absolute bottom-20 left-4 z-30 bg-gray-900/80 text-white px-4 py-2 rounded-lg border-2 border-gray-700 text-xs font-mono">
-          <div>[WASD] - movement</div>
-          <div>[E] - action</div>
-          <div>Facing: {playerDirection}</div>
-          <div>State: {isMoving ? 'Moving' : 'Idle'}</div>
-          <div>Frame: {animationFrame + 1}/4</div>
         </div>
       </div>
     </div>
