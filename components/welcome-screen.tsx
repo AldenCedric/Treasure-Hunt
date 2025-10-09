@@ -27,7 +27,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
       <div className="relative z-10 flex flex-col items-center gap-8 max-w-4xl w-full">
 
         <div className="w-48 h-48 md:w-64 md:h-64">
-          <img src="/cute-cartoon-pirate-character-with-hat-and-sword.jpg" alt="Pirate" className="w-full h-full object-contain drop-shadow-2xl" />
+          <img src="/cute-cartoon-pirate-character-with-hat-and-sword.png" alt="Pirate" className="w-full h-full object-contain drop-shadow-2xl" />
         </div>
 
         <div className="relative">
