@@ -363,7 +363,7 @@ export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong
                   onClick={handleRevealAnswer}
                   disabled={isChecking}
                   size="lg"
-                  className="bg-gradient-to-b from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-black text-2xl px-12 py-6 rounded-xl shadow-2xl border-4 border-red-950 transform hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed">
+                  className="bg-gradient-to-b from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-black text-2xl px-12 py-6 rounded-xl shadow-2xl border-4 border-red-950 transform hover:scale-105 transition-transform">
                   Reveal Answer
                 </Button>
               )}
