@@ -31,7 +31,7 @@ export default function GameBoard(props: GameBoardProps) {
   const [lowAnimations, setLowAnimations] = useState(false)
 
   const MAP_WIDTH = 1024
-  const MAP_HEIGHT = 1024
+  const MAP_HEIGHT = 1200
 
   const [playerDirection, setPlayerDirection] = useState<PlayerDirection>('south')
   const [isMoving, setIsMoving] = useState(false)
@@ -149,7 +149,7 @@ export default function GameBoard(props: GameBoardProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const mapImageRef = useRef<HTMLImageElement | null>(null)
 
-  const [containerDimensions, setContainerDimensions] = useState({ width: 1024, height: 1024 })
+  const [containerDimensions, setContainerDimensions] = useState({ width: 1024, height: 1200 })
   
   useEffect(() => {
     const updateDimensions = () => {
@@ -396,7 +396,7 @@ export default function GameBoard(props: GameBoardProps) {
 
         const rect = containerRef.current?.getBoundingClientRect()
         const viewportWidth = rect?.width ?? 1024
-        const viewportHeight = rect?.height ?? 1024
+        const viewportHeight = rect?.height ?? 1200
         
         const targetCameraX = newX - viewportWidth / 2
         const targetCameraY = newY - viewportHeight / 2
