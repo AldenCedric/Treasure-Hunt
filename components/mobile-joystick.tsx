@@ -116,7 +116,6 @@ export default function MobileJoystick({ onMove, onEPress }: MobileJoystickProps
 
   return (
     <>
-      {/* Joystick */}
       <div className={`fixed z-50 ${isMobile ? "bottom-8 left-8" : "bottom-8 left-8"}`}>
         <div
           ref={joystickRef}
@@ -125,8 +124,8 @@ export default function MobileJoystick({ onMove, onEPress }: MobileJoystickProps
           }`}
           onMouseDown={!isMobile ? handleInteractionStart : undefined}
           onTouchStart={isMobile ? handleInteractionStart : undefined}
-          onContextMenu={handleContextMenu}
-        >
+          onContextMenu={handleContextMenu}>
+
           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-700 to-gray-900" />
 
           <div className="absolute inset-0 rounded-full flex items-center justify-center">
@@ -157,21 +156,10 @@ export default function MobileJoystick({ onMove, onEPress }: MobileJoystickProps
           onTouchStart={isMobile ? handleActionPress : undefined}
           onTouchEnd={isMobile ? handleActionRelease : undefined}
           onContextMenu={handleContextMenu}
-          aria-label="Interact"
-        >
+          aria-label="Interact">
           E
         </button>
       </div>
-
-      {!isMobile && (
-        <div className="fixed bottom-24 left-8 z-50">
-          <div className="bg-blue-500/90 text-blue-900 px-4 py-2 rounded-lg border-2 border-blue-700 shadow-lg text-center max-w-xs backdrop-blur-sm">
-            <p className="font-bold text-xs">
-              🎮 Use joystick or WASD keys
-            </p>
-          </div>
-        </div>
-      )}
     </>
   )
 }

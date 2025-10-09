@@ -372,22 +372,18 @@ export default function GameBoard(props: GameBoardProps) {
         playerPosRef.current = { x: newX, y: newY }
         setPlayerPos({ x: newX, y: newY })
 
-        // FIXED CAMERA CENTERING LOGIC
         const rect = containerRef.current?.getBoundingClientRect()
         const viewportWidth = rect?.width ?? 1000
         const viewportHeight = rect?.height ?? (viewportWidth * 3) / 4
         
-        // Calculate camera position to center player
         const targetCameraX = newX - viewportWidth / 2
         const targetCameraY = newY - viewportHeight / 2
         
-        // Calculate camera bounds based on map size
         const cameraMinX = 0
         const cameraMaxX = MAP_WIDTH - viewportWidth
         const cameraMinY = 0
         const cameraMaxY = MAP_HEIGHT - viewportHeight
         
-        // Clamp camera to map boundaries
         const clampedCameraX = Math.max(cameraMinX, Math.min(cameraMaxX, targetCameraX))
         const clampedCameraY = Math.max(cameraMinY, Math.min(cameraMaxY, targetCameraY))
         
@@ -570,29 +566,14 @@ export default function GameBoard(props: GameBoardProps) {
         }`}>
 
         </div>
-          <div 
-          className={`relative w-full border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]} mx-auto mt-28 mb-32`}
-          style={{
-            aspectRatio: '4 / 3',
-            maxHeight: 'calc(100vh - 240px)',
-            background: '#1a202c',
-            maxWidth: '1200px'
-          }}>
-          <div
-            className="absolute inset-0 transition-transform duration-100"
-            style={{
-              transform: `translate(${cameraOffset.x}px, ${cameraOffset.y}px)`,
-            }}>
-            <div className="absolute inset-0" onClick={handleCanvasClick}>
-              <canvas 
-                ref={canvasRef} 
-                className="block w-full h-full"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'contain'
-                }}/>
-            </div>
+          <div className={`relative w-full border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]} mx-auto mt-28 mb-32`} style={{ aspectRatio: '4 / 3', maxHeight: 'calc(100vh - 240px)', background: '#1a202c', maxWidth: '1200px' }}>
+            <div className="absolute inset-0 transition-transform duration-100" style={{ transform: `translate(${cameraOffset.x}px, ${cameraOffset.y}px)`, }}>
+              <div className="absolute inset-0" onClick={handleCanvasClick}>
+                <canvas 
+                  ref={canvasRef} 
+                  className="block w-full h-full"
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
+              </div>
 
             {!canvasRef.current &&
               visibleMarkers.map((marker) => (
@@ -606,8 +587,7 @@ export default function GameBoard(props: GameBoardProps) {
                   }}>
                   <div
                     className={`w-10 h-10 border-4 border-gray-800 rounded-lg shadow-xl flex items-center justify-center font-black text-gray-900 text-sm transform hover:scale-110 transition-transform ${styles["marker-pulse"]}`}
-                    style={{ backgroundColor: marker.color }}
-                  >
+                    style={{ backgroundColor: marker.color }}>
                     {marker.id}
                   </div>
                   {nearestQuestion === marker.id && (
