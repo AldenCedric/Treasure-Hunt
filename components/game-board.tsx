@@ -31,7 +31,7 @@ export default function GameBoard(props: GameBoardProps) {
   const [lowAnimations, setLowAnimations] = useState(false)
 
   const MAP_WIDTH = 1024
-  const MAP_HEIGHT = 1024
+  const MAP_HEIGHT = 1200
 
   const [playerDirection, setPlayerDirection] = useState<PlayerDirection>('south')
   const [isMoving, setIsMoving] = useState(false)
@@ -77,7 +77,7 @@ export default function GameBoard(props: GameBoardProps) {
     }
   }, [lowAnimations])
 
-  const [playerPos, setPlayerPos] = useState({ x: 512, y: 512 })
+  const [playerPos, setPlayerPos] = useState({ x: 512, y: 600 })
   const playerPosRef = useRef(playerPos)
   const [cameraOffset, setCameraOffset] = useState({ x: 0, y: 0 })
   const keysRef = useRef<Set<string>>(new Set())
@@ -96,26 +96,26 @@ export default function GameBoard(props: GameBoardProps) {
   const MAP_IMAGE = "treasure-hunt-game-board-with-islands-and-paths.jpg"
 
   const DEFAULT_MARKERS: QuestionMarker[] = [
-    { id: 1, x: 459, y: 253, color: "hsl(138 60% 72%)" },
-    { id: 2, x: 353, y: 173, color: "hsl(275 60% 72%)" },
-    { id: 3, x: 485, y: 447, color: "hsl(53 60% 72%)" },
-    { id: 4, x: 453, y: 108, color: "hsl(190 60% 72%)" },
-    { id: 5, x: 563, y: 195, color: "hsl(328 60% 72%)" },
-    { id: 6, x: 543, y: 412, color: "hsl(105 60% 72%)" },
-    { id: 7, x: 708, y: 210, color: "hsl(243 60% 72%)" },
-    { id: 8, x: 794, y: 315, color: "hsl(20 60% 72%)" },
-    { id: 9, x: 783, y: 369, color: "hsl(158 60% 72%)" },
-    { id: 10, x: 575, y: 470, color: "hsl(295 60% 72%)" },
-    { id: 11, x: 245, y: 369, color: "hsl(73 60% 72%)" },
-    { id: 12, x: 698, y: 98, color: "hsl(210 60% 72%)" },
-    { id: 13, x: 822, y: 152, color: "hsl(348 60% 72%)" },
-    { id: 14, x: 385, y: 489, color: "hsl(125 60% 72%)" },
-    { id: 15, x: 717, y: 561, color: "hsl(263 60% 72%)" },
-    { id: 16, x: 548, y: 574, color: "hsl(40 60% 72%)" },
-    { id: 17, x: 312, y: 576, color: "hsl(178 60% 72%)" },
-    { id: 18, x: 284, y: 261, color: "hsl(315 60% 72%)" },
-    { id: 19, x: 269, y: 442, color: "hsl(93 60% 72%)" },
-    { id: 20, x: 164, y: 228, color: "hsl(230 60% 72%)" },
+    { id: 1, x: 459, y: 316, color: "hsl(138 60% 72%)" },
+    { id: 2, x: 353, y: 216, color: "hsl(275 60% 72%)" },
+    { id: 3, x: 485, y: 559, color: "hsl(53 60% 72%)" },
+    { id: 4, x: 453, y: 135, color: "hsl(190 60% 72%)" },
+    { id: 5, x: 563, y: 244, color: "hsl(328 60% 72%)" },
+    { id: 6, x: 543, y: 515, color: "hsl(105 60% 72%)" },
+    { id: 7, x: 708, y: 263, color: "hsl(243 60% 72%)" },
+    { id: 8, x: 794, y: 394, color: "hsl(20 60% 72%)" },
+    { id: 9, x: 783, y: 461, color: "hsl(158 60% 72%)" },
+    { id: 10, x: 575, y: 588, color: "hsl(295 60% 72%)" },
+    { id: 11, x: 245, y: 461, color: "hsl(73 60% 72%)" },
+    { id: 12, x: 698, y: 123, color: "hsl(210 60% 72%)" },
+    { id: 13, x: 822, y: 190, color: "hsl(348 60% 72%)" },
+    { id: 14, x: 385, y: 611, color: "hsl(125 60% 72%)" },
+    { id: 15, x: 717, y: 701, color: "hsl(263 60% 72%)" },
+    { id: 16, x: 548, y: 718, color: "hsl(40 60% 72%)" },
+    { id: 17, x: 312, y: 720, color: "hsl(178 60% 72%)" },
+    { id: 18, x: 284, y: 326, color: "hsl(315 60% 72%)" },
+    { id: 19, x: 269, y: 553, color: "hsl(93 60% 72%)" },
+    { id: 20, x: 164, y: 285, color: "hsl(230 60% 72%)" },
   ]
 
   const pastelColor = (id: number) => {
@@ -149,7 +149,7 @@ export default function GameBoard(props: GameBoardProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const mapImageRef = useRef<HTMLImageElement | null>(null)
 
-  const [containerDimensions, setContainerDimensions] = useState({ width: 1024, height: 1024 })
+  const [containerDimensions, setContainerDimensions] = useState({ width: 1024, height: 1200 })
   
   useEffect(() => {
     const updateDimensions = () => {
@@ -299,7 +299,7 @@ export default function GameBoard(props: GameBoardProps) {
   }
 
   const checkCollision = (x: number, y: number) => {
-    if (x < 100 || x > 924 || y < 100 || y > 924) {
+    if (x < 100 || x > 924 || y < 100 || y > 1100) {
       return true
     }
     return false
@@ -388,7 +388,7 @@ export default function GameBoard(props: GameBoardProps) {
       }
 
       newX = Math.max(100, Math.min(924, newX))
-      newY = Math.max(100, Math.min(924, newY))
+      newY = Math.max(100, Math.min(1100, newY))
 
       if (!checkCollision(newX, newY)) {
         playerPosRef.current = { x: newX, y: newY }
@@ -396,11 +396,11 @@ export default function GameBoard(props: GameBoardProps) {
 
         const rect = containerRef.current?.getBoundingClientRect()
         const viewportWidth = rect?.width ?? 1024
-        const viewportHeight = rect?.height ?? 1024
+        const viewportHeight = rect?.height ?? 1200
         
         const targetCameraX = newX - viewportWidth / 2
         const targetCameraY = newY - viewportHeight / 2
-        
+
         const cameraMinX = 0
         const cameraMaxX = MAP_WIDTH - viewportWidth
         const cameraMinY = 0
@@ -584,13 +584,15 @@ export default function GameBoard(props: GameBoardProps) {
       <div className="relative w-full max-w-7xl" ref={containerRef}>
 
         <div 
-          className={`relative w-full border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]} mx-auto mt-28 mb-32`}
+          className={`relative w-full border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]} mx-auto mt-20 mb-24`}
           style={{
-            aspectRatio: '1 / 1',
-            maxHeight: 'calc(100vh - 240px)',
-            background: '#1a202c',
-            maxWidth: '1024px'
-          }}>
+            width: '1024px',
+            height: '1200px',
+            maxWidth: '1024px',
+            maxHeight: '1200px',
+            background: '#1a202c'
+          }}
+        >
           <div
             className="absolute inset-0 transition-transform duration-100"
             style={{
@@ -601,9 +603,9 @@ export default function GameBoard(props: GameBoardProps) {
                 ref={canvasRef} 
                 className="block w-full h-full"
                 style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'contain'
+                  width: '1024px',
+                  height: '1200px',
+                  display: 'block'
                 }}/>
             </div>
 
@@ -664,7 +666,7 @@ export default function GameBoard(props: GameBoardProps) {
           </div>
         </div>
 
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-30 flex justify-center items-end">
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30 flex justify-center items-end">
           <div className="bg-gray-800 border-4 border-gray-600 rounded-lg px-6 py-3 shadow-xl">
             <div className="flex items-center gap-4">
               <span className="font-black text-white text-sm">PROGRESS:</span>
