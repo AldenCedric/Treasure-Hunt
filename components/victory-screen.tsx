@@ -19,6 +19,23 @@ export default function VictoryScreen({
   completedLevels = [], 
   wrongLevels = [] 
 }: VictoryScreenProps) {
+
+  const calculateSuccessRate = () => {
+    const totalCorrect = completedLevels.length
+    const totalWrong = wrongLevels.length
+    const totalAttempts = totalCorrect + totalWrong
+    
+    if (totalAttempts === 0) return 0
+
+    const successRate = (totalCorrect / totalAttempts) * 100
+    return Math.round(successRate)
+  }
+
+  const successRate = calculateSuccessRate()
+  const totalCorrect = completedLevels.length
+  const totalWrong = wrongLevels.length
+  const totalAttempts = totalCorrect + totalWrong
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden">
       
@@ -46,7 +63,7 @@ export default function VictoryScreen({
             </div>
             
             <p className="text-2xl md:text-3xl font-bold text-amber-950 leading-relaxed mb-6">
-              You found the treasure! 🏴‍☠️
+              Here are your personal results!
             </p>
             
             <div className="bg-amber-100 rounded-2xl border-4 border-amber-800 p-6 max-w-md mx-auto">
@@ -55,21 +72,32 @@ export default function VictoryScreen({
               <div className="space-y-3 text-lg text-amber-900">
                 <div className="flex justify-between">
                   <span>Questions Completed:</span>
-                  <span className="font-bold text-green-700">{completedLevels.length} / 20</span>
+                  <span className="font-bold text-green-700">{totalCorrect} / 20</span>
                 </div>
                 
                 <div className="flex justify-between">
-                  <span>Challenges Faced:</span>
-                  <span className="font-bold text-red-700">{wrongLevels.length}</span>
+                  <span>Correct Answers:</span>
+                  <span className="font-bold text-green-700">{totalCorrect}</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span>Wrong Answers:</span>
+                  <span className="font-bold text-red-700">{totalWrong}</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span>Total Attempts:</span>
+                  <span className="font-bold text-blue-700">{totalAttempts}</span>
                 </div>
                 
                 <div className="flex justify-between">
                   <span>Success Rate:</span>
-                  <span className="font-bold text-blue-700">
-                    {completedLevels.length > 0 
-                      ? `${Math.round((completedLevels.length / 20) * 100)}%` 
-                      : "0%"
-                    }
+                  <span className={`font-bold ${
+                    successRate >= 80 ? "text-green-700" : 
+                    successRate >= 60 ? "text-yellow-600" : 
+                    "text-red-700"
+                  }`}>
+                    {successRate}%
                   </span>
                 </div>
               </div>
