@@ -29,8 +29,9 @@ export default function GameBoard(props: GameBoardProps) {
 
   const SPEED_BASE_REF = useRef(DEFAULT_SPEED)
   const [lowAnimations, setLowAnimations] = useState(false)
-  const MAP_WIDTH = 1600
-  const MAP_HEIGHT = 1200
+
+  const MAP_WIDTH = 1024
+  const MAP_HEIGHT = 1024
 
   const [playerDirection, setPlayerDirection] = useState<PlayerDirection>('south')
   const [isMoving, setIsMoving] = useState(false)
@@ -76,7 +77,7 @@ export default function GameBoard(props: GameBoardProps) {
     }
   }, [lowAnimations])
 
-  const [playerPos, setPlayerPos] = useState({ x: 400, y: 300 })
+  const [playerPos, setPlayerPos] = useState({ x: 512, y: 512 })
   const playerPosRef = useRef(playerPos)
   const [cameraOffset, setCameraOffset] = useState({ x: 0, y: 0 })
   const keysRef = useRef<Set<string>>(new Set())
@@ -95,26 +96,26 @@ export default function GameBoard(props: GameBoardProps) {
   const MAP_IMAGE = "treasure-hunt-game-board-with-islands-and-paths.jpg"
 
   const DEFAULT_MARKERS: QuestionMarker[] = [
-    { id: 1, x: 717, y: 395, color: "hsl(138 60% 72%)" },
-    { id: 2, x: 552, y: 270, color: "hsl(275 60% 72%)" },
-    { id: 3, x: 758, y: 698, color: "hsl(53 60% 72%)" },
-    { id: 4, x: 708, y: 169, color: "hsl(190 60% 72%)" },
-    { id: 5, x: 880, y: 305, color: "hsl(328 60% 72%)" },
-    { id: 6, x: 848, y: 643, color: "hsl(105 60% 72%)" },
-    { id: 7, x: 1106, y: 328, color: "hsl(243 60% 72%)" },
-    { id: 8, x: 1241, y: 492, color: "hsl(20 60% 72%)" },
-    { id: 9, x: 1223, y: 577, color: "hsl(158 60% 72%)" },
-    { id: 10, x: 899, y: 734, color: "hsl(295 60% 72%)" },
-    { id: 11, x: 383, y: 577, color: "hsl(73 60% 72%)" },
-    { id: 12, x: 1091, y: 153, color: "hsl(210 60% 72%)" },
-    { id: 13, x: 1285, y: 237, color: "hsl(348 60% 72%)" },
-    { id: 14, x: 601, y: 764, color: "hsl(125 60% 72%)" },
-    { id: 15, x: 1120, y: 876, color: "hsl(263 60% 72%)" },
-    { id: 16, x: 857, y: 897, color: "hsl(40 60% 72%)" },
-    { id: 17, x: 488, y: 900, color: "hsl(178 60% 72%)" },
-    { id: 18, x: 444, y: 408, color: "hsl(315 60% 72%)" },
-    { id: 19, x: 420, y: 691, color: "hsl(93 60% 72%)" },
-    { id: 20, x: 257, y: 357, color: "hsl(230 60% 72%)" },
+    { id: 1, x: 459, y: 253, color: "hsl(138 60% 72%)" },
+    { id: 2, x: 353, y: 173, color: "hsl(275 60% 72%)" },
+    { id: 3, x: 485, y: 447, color: "hsl(53 60% 72%)" },
+    { id: 4, x: 453, y: 108, color: "hsl(190 60% 72%)" },
+    { id: 5, x: 563, y: 195, color: "hsl(328 60% 72%)" },
+    { id: 6, x: 543, y: 412, color: "hsl(105 60% 72%)" },
+    { id: 7, x: 708, y: 210, color: "hsl(243 60% 72%)" },
+    { id: 8, x: 794, y: 315, color: "hsl(20 60% 72%)" },
+    { id: 9, x: 783, y: 369, color: "hsl(158 60% 72%)" },
+    { id: 10, x: 575, y: 470, color: "hsl(295 60% 72%)" },
+    { id: 11, x: 245, y: 369, color: "hsl(73 60% 72%)" },
+    { id: 12, x: 698, y: 98, color: "hsl(210 60% 72%)" },
+    { id: 13, x: 822, y: 152, color: "hsl(348 60% 72%)" },
+    { id: 14, x: 385, y: 489, color: "hsl(125 60% 72%)" },
+    { id: 15, x: 717, y: 561, color: "hsl(263 60% 72%)" },
+    { id: 16, x: 548, y: 574, color: "hsl(40 60% 72%)" },
+    { id: 17, x: 312, y: 576, color: "hsl(178 60% 72%)" },
+    { id: 18, x: 284, y: 261, color: "hsl(315 60% 72%)" },
+    { id: 19, x: 269, y: 442, color: "hsl(93 60% 72%)" },
+    { id: 20, x: 164, y: 228, color: "hsl(230 60% 72%)" },
   ]
 
   const pastelColor = (id: number) => {
@@ -148,7 +149,7 @@ export default function GameBoard(props: GameBoardProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const mapImageRef = useRef<HTMLImageElement | null>(null)
 
-  const [containerDimensions, setContainerDimensions] = useState({ width: 1200, height: 900 })
+  const [containerDimensions, setContainerDimensions] = useState({ width: 1024, height: 1024 })
   
   useEffect(() => {
     const updateDimensions = () => {
@@ -298,7 +299,7 @@ export default function GameBoard(props: GameBoardProps) {
   }
 
   const checkCollision = (x: number, y: number) => {
-    if (x < 150 || x > 1400 || y < 100 || y > 1050) {
+    if (x < 100 || x > 924 || y < 100 || y > 924) {
       return true
     }
     return false
@@ -386,16 +387,16 @@ export default function GameBoard(props: GameBoardProps) {
         setIsMoving(nowMoving);
       }
 
-      newX = Math.max(150, Math.min(1400, newX))
-      newY = Math.max(100, Math.min(1050, newY))
+      newX = Math.max(100, Math.min(924, newX))
+      newY = Math.max(100, Math.min(924, newY))
 
       if (!checkCollision(newX, newY)) {
         playerPosRef.current = { x: newX, y: newY }
         setPlayerPos({ x: newX, y: newY })
 
         const rect = containerRef.current?.getBoundingClientRect()
-        const viewportWidth = rect?.width ?? 1000
-        const viewportHeight = rect?.height ?? (viewportWidth * 3) / 4
+        const viewportWidth = rect?.width ?? 1024
+        const viewportHeight = rect?.height ?? 1024
         
         const targetCameraX = newX - viewportWidth / 2
         const targetCameraY = newY - viewportHeight / 2
@@ -601,8 +602,8 @@ export default function GameBoard(props: GameBoardProps) {
               <div
                 className="absolute w-2 h-2 bg-red-500 rounded-full border border-white"
                 style={{
-                  left: `${(playerPos.x / 1400) * 100}%`,
-                  top: `${(playerPos.y / 1050) * 100}%`,
+                  left: `${(playerPos.x / 924) * 100}%`,
+                  top: `${(playerPos.y / 924) * 100}%`,
                   transform: "translate(-50%, -50%)",
                 }}
               />
@@ -613,10 +614,10 @@ export default function GameBoard(props: GameBoardProps) {
         <div 
           className={`relative w-full border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]} mx-auto mt-28 mb-32`}
           style={{
-            aspectRatio: '4 / 3',
+            aspectRatio: '1 / 1',
             maxHeight: 'calc(100vh - 240px)',
             background: '#1a202c',
-            maxWidth: '1200px'
+            maxWidth: '1024px'
           }}
         >
           <div
@@ -639,7 +640,6 @@ export default function GameBoard(props: GameBoardProps) {
 
             {!canvasRef.current &&
               visibleMarkers.map((marker) => {
-                
                 const relativeX = (marker.x / MAP_WIDTH) * 100
                 const relativeY = (marker.y / MAP_HEIGHT) * 100
                 
