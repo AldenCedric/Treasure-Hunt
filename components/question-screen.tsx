@@ -372,7 +372,7 @@ export default function QuestionScreen({ level, onCorrectAnswer, onBack, onWrong
                 onClick={handleCheckAnswer}
                 disabled={selectedAnswer === null || isChecking}
                 size="lg"
-                className="bg-gradient-to-b from-green-600 to-green-800 hover:from-green-700 hover:to-green-900 text-white font-black text-2xl px-12 py-6 rounded-xl shadow-2xl border-4 border-green-950 transform hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed">
+                className="bg-gradient-to-b from-green-600 to-green-800 hover:from-green-700 hover:to-green-900 text-white font-black text-2xl px-12 py-6 rounded-xl shadow-2xl border-4 border-green-950 transform hover:scale-105 transition-transform">
                 {isChecking ? "Checking..." : "Submit Answer"}
               </Button>
             </div>

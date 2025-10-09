@@ -115,51 +115,55 @@ export default function MobileJoystick({ onMove, onEPress }: MobileJoystickProps
   }
 
   return (
-    <>
-      <div className={`fixed z-50 ${isMobile ? "bottom-8 left-8" : "bottom-8 left-8"}`}>
-        <div
-          ref={joystickRef}
-          className={`relative bg-gray-800/80 rounded-full border-4 border-gray-700 shadow-2xl backdrop-blur-sm ${
-            isMobile ? "w-32 h-32" : "w-28 h-28"
-          }`}
-          onMouseDown={!isMobile ? handleInteractionStart : undefined}
-          onTouchStart={isMobile ? handleInteractionStart : undefined}
-          onContextMenu={handleContextMenu}>
+    <div className="fixed bottom-4 left-0 right-0 z-50 px-4">
+      <div className="flex justify-between items-end w-full max-w-7xl mx-auto">
 
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-700 to-gray-900" />
-
-          <div className="absolute inset-0 rounded-full flex items-center justify-center">
-            <div className="w-1 h-1 bg-gray-400/50 rounded-full" />
-          </div>
-
+        <div className="flex items-end">
           <div
-            className={`absolute bg-gradient-to-br from-gray-400 to-gray-600 rounded-full border-4 border-gray-800 shadow-lg transition-all duration-100 ${
-              isMobile ? "w-16 h-16" : "w-14 h-14"
+            ref={joystickRef}
+            className={`relative bg-gray-800/80 rounded-full border-4 border-gray-700 shadow-2xl backdrop-blur-sm ${
+              isMobile ? "w-32 h-32" : "w-28 h-28"
             }`}
-            style={{
-              left: "50%",
-              top: "50%",
-              transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px))`,
-            }}
-          />
+            onMouseDown={!isMobile ? handleInteractionStart : undefined}
+            onTouchStart={isMobile ? handleInteractionStart : undefined}
+            onContextMenu={handleContextMenu}
+          >
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-700 to-gray-900" />
+
+            <div className="absolute inset-0 rounded-full flex items-center justify-center">
+              <div className="w-1 h-1 bg-gray-400/50 rounded-full" />
+            </div>
+
+            <div
+              className={`absolute bg-gradient-to-br from-gray-400 to-gray-600 rounded-full border-4 border-gray-800 shadow-lg transition-all duration-100 ${
+                isMobile ? "w-16 h-16" : "w-14 h-14"
+              }`}
+              style={{
+                left: "50%",
+                top: "50%",
+                transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px))`,
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-end">
+          <button
+            className={`bg-gradient-to-b from-orange-600 to-orange-800 rounded-full border-4 border-orange-900 shadow-2xl flex items-center justify-center text-white font-black active:scale-95 transition-transform duration-200 ${
+              isMobile ? "w-20 h-20 text-xl" : "w-16 h-16 text-lg"
+            }`}
+            onMouseDown={!isMobile ? handleActionPress : undefined}
+            onMouseUp={!isMobile ? handleActionRelease : undefined}
+            onMouseLeave={!isMobile ? handleActionRelease : undefined}
+            onTouchStart={isMobile ? handleActionPress : undefined}
+            onTouchEnd={isMobile ? handleActionRelease : undefined}
+            onContextMenu={handleContextMenu}
+            aria-label="Interact"
+          >
+            E
+          </button>
         </div>
       </div>
-
-      <div className={`fixed z-50 ${isMobile ? "bottom-8 right-8" : "bottom-8 right-8"}`}>
-        <button
-          className={`bg-gradient-to-b from-orange-600 to-orange-800 rounded-full border-4 border-orange-900 shadow-2xl flex items-center justify-center text-white font-black active:scale-95 transition-transform duration-200 ${
-            isMobile ? "w-20 h-20 text-xl" : "w-16 h-16 text-lg"
-          }`}
-          onMouseDown={!isMobile ? handleActionPress : undefined}
-          onMouseUp={!isMobile ? handleActionRelease : undefined}
-          onMouseLeave={!isMobile ? handleActionRelease : undefined}
-          onTouchStart={isMobile ? handleActionPress : undefined}
-          onTouchEnd={isMobile ? handleActionRelease : undefined}
-          onContextMenu={handleContextMenu}
-          aria-label="Interact">
-          E
-        </button>
-      </div>
-    </>
+    </div>
   )
 }

@@ -83,7 +83,7 @@ export default function GameBoard(props: GameBoardProps) {
   const [nearestQuestion, setNearestQuestion] = useState<number | null>(null)
   const animationFrameRef = useRef<number>()
   const lastUpdateRef = useRef<number>(Date.now())
-  const [ambientEnabled, setAmbientEnabled] = useState<boolean>(() => {
+  const ambientEnabled = useState<boolean>(() => {
     try {
       const raw = localStorage.getItem("thq_ambient_enabled")
       return raw == null ? true : JSON.parse(raw)
