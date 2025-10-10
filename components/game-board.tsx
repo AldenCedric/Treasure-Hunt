@@ -299,7 +299,7 @@ export default function GameBoard(props: GameBoardProps) {
   }
 
   const checkCollision = (x: number, y: number) => {
-    if (x < 100 || x > 924 || y < 100 || y > 1100) {
+    if (x < 100 || x > 924 || y < 100 || y > 924) {
       return true
     }
     return false
