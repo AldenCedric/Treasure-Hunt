@@ -607,34 +607,6 @@ export default function GameBoard(props: GameBoardProps) {
           </div>
         </div>
 
-        <div className={`absolute top-4 left-1/2 transform -translate-x-1/2 z-30 flex justify-center items-start gap-8 w-full max-w-4xl px-4 ${
-          lowAnimations ? styles.lowAnimations : ""
-        }`}>
-          <div className="bg-gray-200 border-4 border-gray-800 rounded-lg p-4 shadow-xl pixel-corners max-w-xs">
-            <h3 className="font-black text-gray-800 text-lg mb-2 pixel-text">Gather Questions</h3>
-            <div className="space-y-1 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-yellow-400 border-2 border-gray-800 rounded-sm" />
-                <span className="font-bold text-red-600">{completedLevels.length} / 20</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gray-800 border-4 border-gray-600 rounded-full p-2 shadow-xl w-20 h-20 relative overflow-hidden">
-            <div className="absolute inset-1 bg-teal-600 rounded-full">
-              <div className="absolute inset-2 bg-green-600 rounded-full" />
-              <div
-                className="absolute w-2 h-2 bg-red-500 rounded-full border border-white"
-                style={{
-                  left: `${(playerPos.x / 924) * 100}%`,
-                  top: `${(playerPos.y / 924) * 100}%`,
-                  transform: "translate(-50%, -50%)",
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
         <div 
           className={`relative w-full border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]} mx-auto mt-28 mb-32`}
           style={{
