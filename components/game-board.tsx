@@ -581,32 +581,6 @@ export default function GameBoard(props: GameBoardProps) {
         }, [])}
       </div>
 
-      <div className="relative w-full max-w-7xl" ref={containerRef}>
-
-        <div className="absolute top-20 right-4 z-30 bg-gray-900/90 text-white p-4 rounded-lg border-2 border-blue-400 shadow-2xl min-w-48">
-          <h3 className="text-lg font-bold text-blue-400 mb-2">Player Position</h3>
-          <div className="space-y-2 font-mono text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-400">X:</span>
-              <span className="text-green-400 font-bold">{playerPos.x}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Y:</span>
-              <span className="text-green-400 font-bold">{playerPos.y}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Direction:</span>
-              <span className="text-yellow-400 font-bold capitalize">{playerDirection}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">State:</span>
-              <span className={`font-bold ${isMoving ? 'text-orange-400' : 'text-gray-400'}`}>
-                {isMoving ? 'Moving' : 'Idle'}
-              </span>
-            </div>
-          </div>
-        </div>
-
         <div 
           className={`relative w-full border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]} mx-auto mt-28 mb-32`}
           style={{
