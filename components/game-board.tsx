@@ -388,7 +388,7 @@ export default function GameBoard(props: GameBoardProps) {
       }
 
       newX = Math.max(100, Math.min(924, newX))
-      newY = Math.max(100, Math.min(1100, newY))
+      newY = Math.max(100, Math.min(924, newY))
 
       if (!checkCollision(newX, newY)) {
         playerPosRef.current = { x: newX, y: newY }
