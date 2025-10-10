@@ -149,7 +149,7 @@ export default function GameBoard(props: GameBoardProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const mapImageRef = useRef<HTMLImageElement | null>(null)
 
-  const [containerDimensions, setContainerDimensions] = useState({ width: 1024, height: 1024 })
+  const [containerDimensions, setContainerDimensions] = useState({ width: 1024, height: 1200 })
   
   useEffect(() => {
     const updateDimensions = () => {
