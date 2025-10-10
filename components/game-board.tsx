@@ -96,14 +96,14 @@ export default function GameBoard(props: GameBoardProps) {
   const MAP_IMAGE = "treasure-hunt-game-board-with-islands-and-paths.jpg"
 
   const DEFAULT_MARKERS: QuestionMarker[] = [
-    { id: 1, x: 259, y: 144, color: "hsl(138 60% 72%)" },
-    { id: 2, x: 452, y: 200, color: "hsl(275 60% 72%)" },
-    { id: 3, x: 354, y: 306, color: "hsl(53 60% 72%)" },
-    { id: 4, x: 73, y: 356, color: "hsl(190 60% 72%)" },
-    { id: 5, x: 300, y: 405, color: "hsl(328 60% 72%)" },
-    { id: 6, x: 250, y: 582, color: "hsl(105 60% 72%)" },
-    { id: 7, x: 542, y: 650, color: "hsl(243 60% 72%)" },
-    { id: 8, x: 582, y: 720, color: "hsl(20 60% 72%)" },
+    { id: 1, x: 259, y: 114, color: "hsl(138 60% 72%)" },
+    { id: 2, x: 452, y: 170, color: "hsl(275 60% 72%)" },
+    { id: 3, x: 354, y: 266, color: "hsl(53 60% 72%)" },
+    { id: 4, x: 285, y: 406, color: "hsl(190 60% 72%)" },
+    { id: 5, x: 247, y: 575, color: "hsl(328 60% 72%)" },
+    { id: 6, x: 270, y: 690, color: "hsl(105 60% 72%)" },
+    { id: 7, x: 542, y: 639, color: "hsl(243 60% 72%)" },
+    { id: 8, x: 484, y: 700, color: "hsl(20 60% 72%)" },
     { id: 9, x: 384, y: 793, color: "hsl(158 60% 72%)" },
     { id: 10, x: 312, y: 930, color: "hsl(295 60% 72%)" },
     { id: 11, x: 717, y: 904, color: "hsl(73 60% 72%)" },
