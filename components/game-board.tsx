@@ -37,6 +37,10 @@ export default function GameBoard(props: GameBoardProps) {
   const [isMoving, setIsMoving] = useState(false)
   const [animationFrame, setAnimationFrame] = useState(0)
 
+  const [editPlacements, setEditPlacements] = useState(false)
+  const [selectedPlacementId, setSelectedPlacementId] = useState(1)
+  const [originalCoordinates, setOriginalCoordinates] = useState<{x: number, y: number} | null>(null)
+
   const spriteSheets = {
     north: './player-north-sheet.png',
     south: './player-south-sheet.png',
@@ -151,6 +155,10 @@ export default function GameBoard(props: GameBoardProps) {
 
   const [containerDimensions, setContainerDimensions] = useState({ width: 1024, height: 1200 })
   
+  const selectedMarker = useMemo(() => {
+    return questionMarkers.find(marker => marker.id === selectedPlacementId)
+  }, [questionMarkers, selectedPlacementId])
+
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
@@ -169,6 +177,54 @@ export default function GameBoard(props: GameBoardProps) {
       window.removeEventListener('resize', updateDimensions)
     }
   }, [])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase()
+      
+      if (key === "p") {
+        e.preventDefault()
+        setEditPlacements(prev => !prev)
+        if (!editPlacements && selectedMarker) {
+          setOriginalCoordinates({ x: selectedMarker.x, y: selectedMarker.y })
+        }
+        return
+      }
+
+      if (key === "[") {
+        setSelectedMarkerIndex((i) => Math.max(0, i - 1))
+      }
+      if (key === "]") {
+        setSelectedMarkerIndex((i) => Math.min(questionMarkers.length - 1, i + 1))
+      }
+      if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "e"].includes(key)) {
+        e.preventDefault()
+        keysRef.current.add(key)
+
+        if (key === "w" || key === "arrowup") setPlayerDirection('north')
+        if (key === "s" || key === "arrowdown") setPlayerDirection('south')
+        if (key === "a" || key === "arrowleft") setPlayerDirection('west')
+        if (key === "d" || key === "arrowright") setPlayerDirection('east')
+
+        if (key === "e" && nearestQuestion !== null) {
+          onLevelClick(nearestQuestion)
+        }
+      }
+    }
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase()
+      keysRef.current.delete(key)
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    window.addEventListener("keyup", handleKeyUp)
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+      window.removeEventListener("keyup", handleKeyUp)
+    }
+  }, [nearestQuestion, onLevelClick, questionMarkers.length, editPlacements, selectedMarker])
 
   useEffect(() => {
     const directions: PlayerDirection[] = ['north', 'south', 'east', 'west'];
@@ -217,44 +273,6 @@ export default function GameBoard(props: GameBoardProps) {
   }, [isMoving]);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase()
-      if (key === "[") {
-        setSelectedMarkerIndex((i) => Math.max(0, i - 1))
-      }
-      if (key === "]") {
-        setSelectedMarkerIndex((i) => Math.min(questionMarkers.length - 1, i + 1))
-      }
-      if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "e"].includes(key)) {
-        e.preventDefault()
-        keysRef.current.add(key)
-
-        if (key === "w" || key === "arrowup") setPlayerDirection('north')
-        if (key === "s" || key === "arrowdown") setPlayerDirection('south')
-        if (key === "a" || key === "arrowleft") setPlayerDirection('west')
-        if (key === "d" || key === "arrowright") setPlayerDirection('east')
-
-        if (key === "e" && nearestQuestion !== null) {
-          onLevelClick(nearestQuestion)
-        }
-      }
-    }
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase()
-      keysRef.current.delete(key)
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    window.addEventListener("keyup", handleKeyUp)
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-      window.removeEventListener("keyup", handleKeyUp)
-    }
-  }, [nearestQuestion, onLevelClick, questionMarkers.length])
-
-  useEffect(() => {
     try {
       localStorage.setItem("thq_marker_positions", JSON.stringify(questionMarkers))
     } catch {
@@ -282,6 +300,28 @@ export default function GameBoard(props: GameBoardProps) {
   }, [ambientEnabled])
 
   const handleCanvasClick = (e: React.MouseEvent) => {
+    if (editPlacements && selectedMarker) {
+      const canvas = canvasRef.current
+      if (!canvas) return
+      
+      const rect = canvas.getBoundingClientRect()
+      const scaleX = MAP_WIDTH / rect.width
+      const scaleY = MAP_HEIGHT / rect.height
+      const logicalX = (e.clientX - rect.left) * scaleX
+      const logicalY = (e.clientY - rect.top) * scaleY
+      
+      setQuestionMarkers((prev) => {
+        const copy = prev.map((m) => ({ ...m }))
+        const marker = copy.find(m => m.id === selectedPlacementId)
+        if (marker) {
+          marker.x = Math.round(logicalX)
+          marker.y = Math.round(logicalY)
+        }
+        return copy
+      })
+      return
+    }
+
     const canvas = canvasRef.current
     if (!canvas) return
     const rect = canvas.getBoundingClientRect()
@@ -351,6 +391,28 @@ export default function GameBoard(props: GameBoardProps) {
     }
 
     ctx.restore();
+  }
+
+  const handlePreviousPlacement = () => {
+    setSelectedPlacementId(prev => Math.max(1, prev - 1))
+  }
+
+  const handleNextPlacement = () => {
+    setSelectedPlacementId(prev => Math.min(20, prev + 1))
+  }
+
+  const handleResetPlacement = () => {
+    if (originalCoordinates && selectedMarker) {
+      setQuestionMarkers((prev) => {
+        const copy = prev.map((m) => ({ ...m }))
+        const marker = copy.find(m => m.id === selectedPlacementId)
+        if (marker) {
+          marker.x = originalCoordinates.x
+          marker.y = originalCoordinates.y
+        }
+        return copy
+      })
+    }
   }
 
   useEffect(() => {
@@ -583,6 +645,102 @@ export default function GameBoard(props: GameBoardProps) {
 
       <div className="relative w-full max-w-7xl" ref={containerRef}>
 
+        {editPlacements && (
+          <div className="absolute top-20 left-4 z-50 bg-gray-900/95 text-white p-4 rounded-lg border-2 border-yellow-400 shadow-2xl min-w-80">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-yellow-400">Edit Placements</h3>
+              <button
+                onClick={() => setEditPlacements(false)}
+                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-bold">
+                Close
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-medium">Placement ID:</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handlePreviousPlacement}
+                    className="bg-gray-700 hover:bg-gray-600 text-white w-8 h-8 rounded flex items-center justify-center font-bold">
+                    ←
+                  </button>
+                  <span className="font-bold text-yellow-400 min-w-8 text-center">
+                    {selectedPlacementId}
+                  </span>
+                  <button
+                    onClick={handleNextPlacement}
+                    className="bg-gray-700 hover:bg-gray-600 text-white w-8 h-8 rounded flex items-center justify-center font-bold">
+                    →
+                  </button>
+                </div>
+              </div>
+
+              {selectedMarker && (
+                <>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-gray-400">Original:</span>
+                      <div className="font-mono">
+                        {originalCoordinates ? `${originalCoordinates.x}, ${originalCoordinates.y}` : 'N/A'}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">Current:</span>
+                      <div className="font-mono text-green-400">
+                        {selectedMarker.x}, {selectedMarker.y}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-gray-700">
+                    <button
+                      onClick={handleResetPlacement}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-bold w-full"
+                      disabled={!originalCoordinates}>
+                      Reset to Original
+                    </button>
+                  </div>
+                </>
+              )}
+
+              <div className="text-xs text-gray-400 pt-2 border-t border-gray-700">
+                <div>• Press [P] to toggle editor</div>
+                <div>• Click on canvas to move selected placement</div>
+                <div>• Use arrows to navigate placements</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className={`absolute top-4 left-1/2 transform -translate-x-1/2 z-30 flex justify-center items-start gap-8 w-full max-w-4xl px-4 ${
+          lowAnimations ? styles.lowAnimations : ""
+        }`}>
+          <div className="bg-gray-200 border-4 border-gray-800 rounded-lg p-4 shadow-xl pixel-corners max-w-xs">
+            <h3 className="font-black text-gray-800 text-lg mb-2 pixel-text">Gather Questions</h3>
+            <div className="space-y-1 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-yellow-400 border-2 border-gray-800 rounded-sm" />
+                <span className="font-bold text-red-600">{completedLevels.length} / 20</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-800 border-4 border-gray-600 rounded-full p-2 shadow-xl w-20 h-20 relative overflow-hidden">
+            <div className="absolute inset-1 bg-teal-600 rounded-full">
+              <div className="absolute inset-2 bg-green-600 rounded-full" />
+              <div
+                className="absolute w-2 h-2 bg-red-500 rounded-full border border-white"
+                style={{
+                  left: `${(playerPos.x / 924) * 100}%`,
+                  top: `${(playerPos.y / 1100) * 100}%`,
+                  transform: "translate(-50%, -50%)",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
         <div 
           className={`relative w-full border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]} mx-auto mt-28 mb-32`}
           style={{
@@ -603,9 +761,21 @@ export default function GameBoard(props: GameBoardProps) {
                 style={{
                   width: '100%',
                   height: '100%',
-                  objectFit: 'contain'
+                  objectFit: 'contain',
+                  cursor: editPlacements ? 'crosshair' : 'default'
                 }}/>
             </div>
+
+            {editPlacements && selectedMarker && (
+              <div
+                className="absolute z-40 pointer-events-none"
+                style={{
+                  left: `${(selectedMarker.x / MAP_WIDTH) * 100}%`,
+                  top: `${(selectedMarker.y / MAP_HEIGHT) * 100}%`,
+                  transform: 'translate(-50%, -50%)',
+                }}>
+              </div>
+            )}
 
             {!canvasRef.current &&
               visibleMarkers.map((marker) => {
@@ -677,6 +847,20 @@ export default function GameBoard(props: GameBoardProps) {
               <span className="font-black text-yellow-400 text-lg">{completedLevels.length} / 20</span>
             </div>
           </div>
+        </div>
+
+        <div className="absolute bottom-20 left-4 z-30 bg-gray-900/80 text-white px-4 py-2 rounded-lg border-2 border-gray-700 text-xs font-mono">
+          <div>[WASD] - movement</div>
+          <div>[E] - action</div>
+          <div>[P] - {editPlacements ? 'DISABLE' : 'ENABLE'} placement editor</div>
+          <div>Facing: {playerDirection}</div>
+          <div>State: {isMoving ? 'Moving' : 'Idle'}</div>
+          <div>Frame: {animationFrame + 1}/4</div>
+          {editPlacements && (
+            <div className="text-yellow-400 font-bold mt-1">
+              PLACEMENT EDITOR ACTIVE
+            </div>
+          )}
         </div>
       </div>
     </div>
