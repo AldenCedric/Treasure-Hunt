@@ -581,6 +581,7 @@ export default function GameBoard(props: GameBoardProps) {
         }, [])}
       </div>
 
+      <div className="relative w-full max-w-7xl" ref={containerRef}>
         <div 
           className={`relative w-full border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]} mx-auto mt-28 mb-32`}
           style={{
