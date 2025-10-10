@@ -79,6 +79,7 @@ export default function GameBoard(props: GameBoardProps) {
 
   const [playerPos, setPlayerPos] = useState({ x: 512, y: 512 })
   const playerPosRef = useRef(playerPos)
+  const [cameraOffset, setCameraOffset] = useState({ x: 0, y: 0 })
   const keysRef = useRef<Set<string>>(new Set())
   const [nearestQuestion, setNearestQuestion] = useState<number | null>(null)
   const animationFrameRef = useRef<number>()
@@ -147,6 +148,27 @@ export default function GameBoard(props: GameBoardProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const mapImageRef = useRef<HTMLImageElement | null>(null)
+
+  const [containerDimensions, setContainerDimensions] = useState({ width: 1024, height: 1024 })
+  
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect()
+        setContainerDimensions({
+          width: rect.width,
+          height: rect.height
+        })
+      }
+    }
+
+    updateDimensions()
+    window.addEventListener('resize', updateDimensions)
+    
+    return () => {
+      window.removeEventListener('resize', updateDimensions)
+    }
+  }, [])
 
   useEffect(() => {
     const directions: PlayerDirection[] = ['north', 'south', 'east', 'west'];
@@ -371,6 +393,23 @@ export default function GameBoard(props: GameBoardProps) {
       if (!checkCollision(newX, newY)) {
         playerPosRef.current = { x: newX, y: newY }
         setPlayerPos({ x: newX, y: newY })
+
+        const rect = containerRef.current?.getBoundingClientRect()
+        const viewportWidth = rect?.width ?? 1024
+        const viewportHeight = rect?.height ?? 1024
+        
+        const targetCameraX = newX - viewportWidth / 2
+        const targetCameraY = newY - viewportHeight / 2
+
+        const cameraMinX = 0
+        const cameraMaxX = MAP_WIDTH - viewportWidth
+        const cameraMinY = 0
+        const cameraMaxY = MAP_HEIGHT - viewportHeight
+        
+        const clampedCameraX = Math.max(cameraMinX, Math.min(cameraMaxX, targetCameraX))
+        const clampedCameraY = Math.max(cameraMinY, Math.min(cameraMaxY, targetCameraY))
+        
+        setCameraOffset({ x: -clampedCameraX, y: -clampedCameraY })
       }
 
       let closest: number | null = null
@@ -571,21 +610,24 @@ export default function GameBoard(props: GameBoardProps) {
         <div 
           className={`relative w-full border-8 rounded-lg shadow-2xl overflow-hidden ${styles["map-frame"]} mx-auto mt-28 mb-32`}
           style={{
-            width: '1024px',
-            height: '1024px',
-            maxWidth: '1024px',
-            maxHeight: '1024px',
-            background: '#1a202c'
+            aspectRatio: '1 / 1',
+            maxHeight: 'calc(100vh - 240px)',
+            background: '#1a202c',
+            maxWidth: '1024px'
           }}>
-          <div className="absolute inset-0">
+          <div
+            className="absolute inset-0 transition-transform duration-100"
+            style={{
+              transform: `translate(${cameraOffset.x}px, ${cameraOffset.y}px)`,
+            }}>
             <div className="absolute inset-0" onClick={handleCanvasClick}>
               <canvas 
                 ref={canvasRef} 
                 className="block w-full h-full"
                 style={{
-                  width: '1024px',
-                  height: '1024px',
-                  display: 'block'
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain'
                 }}/>
             </div>
 
