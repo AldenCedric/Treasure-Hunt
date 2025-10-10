@@ -31,7 +31,7 @@ export default function GameBoard(props: GameBoardProps) {
   const [lowAnimations, setLowAnimations] = useState(false)
 
   const MAP_WIDTH = 1024
-  const MAP_HEIGHT = 1024
+  const MAP_HEIGHT = 1200
 
   const [playerDirection, setPlayerDirection] = useState<PlayerDirection>('south')
   const [isMoving, setIsMoving] = useState(false)
