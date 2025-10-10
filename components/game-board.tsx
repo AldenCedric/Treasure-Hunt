@@ -96,26 +96,26 @@ export default function GameBoard(props: GameBoardProps) {
   const MAP_IMAGE = "treasure-hunt-game-board-with-islands-and-paths.jpg"
 
   const DEFAULT_MARKERS: QuestionMarker[] = [
-    { id: 1, x: 259, y: 114, color: "hsl(138 60% 72%)" },
-    { id: 2, x: 452, y: 170, color: "hsl(275 60% 72%)" },
-    { id: 3, x: 354, y: 266, color: "hsl(53 60% 72%)" },
-    { id: 4, x: 285, y: 406, color: "hsl(190 60% 72%)" },
-    { id: 5, x: 247, y: 575, color: "hsl(328 60% 72%)" },
-    { id: 6, x: 270, y: 690, color: "hsl(105 60% 72%)" },
-    { id: 7, x: 542, y: 639, color: "hsl(243 60% 72%)" },
-    { id: 8, x: 484, y: 700, color: "hsl(20 60% 72%)" },
-    { id: 9, x: 384, y: 763, color: "hsl(158 60% 72%)" },
-    { id: 10, x: 312, y: 900, color: "hsl(295 60% 72%)" },
-    { id: 11, x: 717, y: 874, color: "hsl(73 60% 72%)" },
-    { id: 12, x: 829, y: 676, color: "hsl(210 60% 72%)" },
-    { id: 13, x: 785, y: 578, color: "hsl(348 60% 72%)" },
-    { id: 14, x: 795, y: 489, color: "hsl(125 60% 72%)" },
-    { id: 15, x: 461, y: 394, color: "hsl(263 60% 72%)" },
-    { id: 16, x: 710, y: 326, color: "hsl(40 60% 72%)" },
-    { id: 17, x: 564, y: 304, color: "hsl(178 60% 72%)" },
-    { id: 18, x: 610, y: 226, color: "hsl(315 60% 72%)" },
-    { id: 19, x: 697, y: 149, color: "hsl(93 60% 72%)" },
-    { id: 20, x: 824, y: 232, color: "hsl(230 60% 72%)" },
+    { id: 1, x: 259, y: 144, color: "hsl(138 60% 72%)" },
+    { id: 2, x: 452, y: 200, color: "hsl(275 60% 72%)" },
+    { id: 3, x: 354, y: 306, color: "hsl(53 60% 72%)" },
+    { id: 4, x: 73, y: 356, color: "hsl(190 60% 72%)" },
+    { id: 5, x: 300, y: 405, color: "hsl(328 60% 72%)" },
+    { id: 6, x: 250, y: 582, color: "hsl(105 60% 72%)" },
+    { id: 7, x: 542, y: 650, color: "hsl(243 60% 72%)" },
+    { id: 8, x: 582, y: 720, color: "hsl(20 60% 72%)" },
+    { id: 9, x: 384, y: 793, color: "hsl(158 60% 72%)" },
+    { id: 10, x: 312, y: 930, color: "hsl(295 60% 72%)" },
+    { id: 11, x: 717, y: 904, color: "hsl(73 60% 72%)" },
+    { id: 12, x: 829, y: 706, color: "hsl(210 60% 72%)" },
+    { id: 13, x: 785, y: 608, color: "hsl(348 60% 72%)" },
+    { id: 14, x: 795, y: 519, color: "hsl(125 60% 72%)" },
+    { id: 15, x: 461, y: 424, color: "hsl(263 60% 72%)" },
+    { id: 16, x: 710, y: 356, color: "hsl(40 60% 72%)" },
+    { id: 17, x: 564, y: 334, color: "hsl(178 60% 72%)" },
+    { id: 18, x: 610, y: 256, color: "hsl(315 60% 72%)" },
+    { id: 19, x: 697, y: 179, color: "hsl(93 60% 72%)" },
+    { id: 20, x: 824, y: 262, color: "hsl(230 60% 72%)" },
   ]
 
   const pastelColor = (id: number) => {
@@ -299,7 +299,7 @@ export default function GameBoard(props: GameBoardProps) {
   }
 
   const checkCollision = (x: number, y: number) => {
-    if (x < 50 || x > 974 || y < 50 || y > 974) {
+    if (x < 150 || x > 906 || y < 150 || y > 906) {
       return true
     }
     return false
@@ -387,8 +387,8 @@ export default function GameBoard(props: GameBoardProps) {
         setIsMoving(nowMoving);
       }
 
-      newX = Math.max(50, Math.min(974, newX))
-      newY = Math.max(50, Math.min(974, newY))
+      newX = Math.max(150, Math.min(906, newX))
+      newY = Math.max(150, Math.min(906, newY))
 
       if (!checkCollision(newX, newY)) {
         playerPosRef.current = { x: newX, y: newY }
