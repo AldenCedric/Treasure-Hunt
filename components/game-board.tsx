@@ -608,16 +608,15 @@ export default function GameBoard(props: GameBoardProps) {
 
             {!canvasRef.current &&
               visibleMarkers.map((marker) => {
-                const relativeX = (marker.x / MAP_WIDTH) * 100
-                const relativeY = (marker.y / MAP_HEIGHT) * 100
-                
+                const left = (marker.x / MAP_WIDTH) * containerDimensions.width;
+                const top = (marker.y / MAP_HEIGHT) * containerDimensions.height;
                 return (
                   <div
                     key={marker.id}
                     className="absolute"
                     style={{
-                      left: `${relativeX}%`,
-                      top: `${relativeY}%`,
+                      left: left,
+                      top: top,
                       transform: 'translate(-50%, -50%)',
                       zIndex: 100,
                     }}>
